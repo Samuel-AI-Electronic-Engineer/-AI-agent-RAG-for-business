@@ -10,7 +10,7 @@ API REST construida con **FastAPI** y **PostgreSQL** para la plataforma de poes�
 poetry-fiction-backend/
 ├── app/
 │   ├── main.py              ← Punto de entrada de la app
-│   ├── database.py          ← Conexión y sesión MySQL
+│   ├── database.py          ← Conexión y sesión PostgreSQL
 │   ├── deps.py              ← Dependencias (auth JWT)
 │   ├── core/
 │   │   ├── config.py        ← Variables de entorno
