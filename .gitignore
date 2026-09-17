@@ -1,0 +1,29 @@
+# Frontend
+poesia-ficcion-react/node_modules/
+poesia-ficcion-react/dist/
+poesia-ficcion-react/.env
+poesia-ficcion-react/.env.*
+!poesia-ficcion-react/.env.example
+
+# Backend
+poetry-fiction-backend/poetry-fiction-backend/venv/
+poetry-fiction-backend/poetry-fiction-backend/__pycache__/
+poetry-fiction-backend/poetry-fiction-backend/.env
+poetry-fiction-backend/poetry-fiction-backend/.env.*
+!poetry-fiction-backend/poetry-fiction-backend/.env.example
+
+# Python caches and local tooling
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Editor and operating system files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Legacy static frontend build artifacts
+poetry-fiction-frontend/node_modules/
+poetry-fiction-frontend/dist/
