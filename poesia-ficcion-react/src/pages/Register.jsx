@@ -22,7 +22,7 @@ function Register() {
             const data = await registerRequest({ username, full_name: name, email, password });
             login(data.user, data.access_token);
             navigate('/dashboard');
-        } catch (err) {
+        } catch {
             setError('No se pudo crear la cuenta. Revisa los datos.');
         } finally {
             setIsSubmitting(false);

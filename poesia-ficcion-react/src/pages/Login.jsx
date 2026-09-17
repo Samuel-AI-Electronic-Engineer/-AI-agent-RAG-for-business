@@ -20,7 +20,7 @@ function Login() {
             const data = await loginRequest(email, password);
             login(data.user, data.access_token);
             navigate('/dashboard');
-        } catch (err) {
+        } catch {
             setError('Credenciales inválidas. Intenta otra vez.');
         } finally {
             setIsSubmitting(false);

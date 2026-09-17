@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import { login as loginRequest, register as registerRequest } from '../services/authService';
-import { useModal } from '../context/ModalContext';
+import { useModal } from '../context/useModal';
 
 function ModalAuth() {
     const { modal, closeModal, openModal } = useModal();
@@ -18,14 +18,6 @@ function ModalAuth() {
     const [statusMessage, setStatusMessage] = useState('');
     const [statusType, setStatusType] = useState('');
     const [submitting, setSubmitting] = useState(false);
-
-    useEffect(() => {
-        if (!modal) {
-            setStatusMessage('');
-            setStatusType('');
-            setSubmitting(false);
-        }
-    }, [modal]);
 
     const handleLogin = async () => {
         if (!loginEmail || !loginPassword) {
@@ -47,7 +39,7 @@ function ModalAuth() {
                 navigate('/dashboard');
             }, 1200);
         } catch (error) {
-            setStatusMessage(error?.response?.data?.message || 'Error al iniciar sesión.');
+            setStatusMessage(error?.response?.data?.detail || 'Error al iniciar sesión.');
             setStatusType('error');
         } finally {
             setSubmitting(false);
@@ -79,7 +71,7 @@ function ModalAuth() {
                 navigate('/dashboard');
             }, 1200);
         } catch (error) {
-            setStatusMessage(error?.response?.data?.message || 'Error al registrarse.');
+            setStatusMessage(error?.response?.data?.detail || 'Error al registrarse.');
             setStatusType('error');
         } finally {
             setSubmitting(false);

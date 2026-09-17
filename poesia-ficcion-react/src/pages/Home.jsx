@@ -1,20 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getPosts } from '../services/postsService';
+import { getPostStats, getPosts } from '../services/postsService';
 import PoemCard from '../components/poems/PoemCard';
 import Footer from '../components/layout/Footer';
-import { useModal } from '../context/ModalContext';
+import { useModal } from '../context/useModal';
 
 function Home() {
     const { openModal } = useModal();
     const [newsletterEmail, setNewsletterEmail] = useState('');
     const [newsletterMessage, setNewsletterMessage] = useState('');
-    const [newsletterType, setNewsletterType] = useState('');
     const statsRef = useRef(null);
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ['posts', 'home'],
         queryFn: () => getPosts(1, 'poema'),
+    });
+    const { data: stats } = useQuery({
+        queryKey: ['posts', 'stats'],
+        queryFn: getPostStats,
     });
 
     const items = data?.items || [];
@@ -68,9 +71,9 @@ function Home() {
             (entries, obs) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
-                        animateCount(document.getElementById('cnt-poems'), 248);
-                        animateCount(document.getElementById('cnt-stories'), 97);
-                        animateCount(document.getElementById('cnt-authors'), 63);
+                        animateCount(document.getElementById('cnt-poems'), stats?.poems ?? 0);
+                        animateCount(document.getElementById('cnt-stories'), stats?.stories ?? 0);
+                        animateCount(document.getElementById('cnt-authors'), stats?.authors ?? 0);
                         obs.disconnect();
                     }
                 });
@@ -80,19 +83,16 @@ function Home() {
 
         observer.observe(statsSection);
         return () => observer.disconnect();
-    }, []);
+    }, [stats]);
 
     const handleSubscribe = () => {
         const email = newsletterEmail.trim();
         if (!email || !email.includes('@')) {
-            setNewsletterType('error');
             setNewsletterMessage('Ingresa un correo válido.');
             return;
         }
 
-        setNewsletterType('success');
-        setNewsletterMessage('¡Gracias! Pronto recibirás el cosmos en tu correo.');
-        setNewsletterEmail('');
+        setNewsletterMessage('La newsletter estará disponible próximamente.');
     };
 
     const scrollToSection = (sectionId) => {

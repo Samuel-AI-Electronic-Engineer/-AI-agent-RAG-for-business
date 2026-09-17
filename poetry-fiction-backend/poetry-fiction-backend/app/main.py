@@ -77,7 +77,7 @@ def create_dev_seed_data() -> None:
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_app: FastAPI):
     """Acciones al iniciar y apagar la aplicación."""
     # ── Startup ──────────────────────────────────────────────
     print(f"\n🚀  Iniciando {settings.APP_NAME} v{settings.APP_VERSION}")

@@ -16,3 +16,8 @@ export const getPost = async (id) => {
     const { data } = await api.get(`/posts/${id}`);
     return data;
 };
+
+export const getPostStats = async () => {
+    const { data } = await api.get('/posts/stats');
+    return data;
+};

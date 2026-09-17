@@ -25,5 +25,6 @@ poetry-fiction-backend/poetry-fiction-backend/.env.*
 Thumbs.db
 
 # Legacy static frontend build artifacts
+poetry-fiction-frontend/
 poetry-fiction-frontend/node_modules/
 poetry-fiction-frontend/dist/

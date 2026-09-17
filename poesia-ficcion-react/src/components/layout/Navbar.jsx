@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
-import { useModal } from '../../context/ModalContext';
+import { useModal } from '../../context/useModal';
 
 function Navbar() {
     const [isOpen, setIsOpen] = useState(false);

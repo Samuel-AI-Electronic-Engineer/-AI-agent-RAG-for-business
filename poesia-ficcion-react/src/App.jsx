@@ -1,7 +1,7 @@
 import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import { ModalProvider } from './context/ModalContext';
+import { ModalProvider } from './context/ModalContext.jsx';
 import Starfield from './components/Starfield';
 import Navbar from './components/layout/Navbar';
 import AuthModal from './components/ModalAuth';
