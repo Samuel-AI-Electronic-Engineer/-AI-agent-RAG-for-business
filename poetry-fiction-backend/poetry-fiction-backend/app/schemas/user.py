@@ -19,8 +19,8 @@ class UserCreate(BaseModel):
 
     @field_validator("email")
     @classmethod
-    def normalize_email(cls, value: EmailStr) -> EmailStr:
-        return EmailStr(str(value).strip().lower())
+    def normalize_email(cls, value: EmailStr) -> str:
+        return str(value).strip().lower()
 
     @field_validator("password")
     @classmethod
@@ -72,8 +72,8 @@ class LoginRequest(BaseModel):
 
     @field_validator("email")
     @classmethod
-    def normalize_email(cls, value: EmailStr) -> EmailStr:
-        return EmailStr(str(value).strip().lower())
+    def normalize_email(cls, value: EmailStr) -> str:
+        return str(value).strip().lower()
 
 
 class TokenResponse(BaseModel):
