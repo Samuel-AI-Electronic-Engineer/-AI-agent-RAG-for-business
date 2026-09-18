@@ -240,3 +240,16 @@ button {
         justify-content: space-between;
     }
 }
+
+.password-rules {
+    display: grid;
+    gap: 4px;
+    margin: -6px 0 18px;
+    padding-left: 18px;
+    color: #a9a1bd;
+    font-size: 0.82rem;
+}
+
+.password-rules li.valid {
+    color: #8ee6bd;
+}

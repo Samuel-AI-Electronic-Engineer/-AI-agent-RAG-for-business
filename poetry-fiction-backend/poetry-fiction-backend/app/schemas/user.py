@@ -1,14 +1,39 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, field_validator
 
 
 # ─── ENTRADA ─────────────────────────────────────────────────
 
 class UserCreate(BaseModel):
-    username: str = Field(..., min_length=3, max_length=50, example="poetaurbano")
+    username: str = Field(..., min_length=3, max_length=50,
+                          pattern=r"^[a-zA-Z0-9_]+$", example="poetaurbano")
     email: EmailStr = Field(..., example="poeta@ejemplo.com")
-    password: str = Field(..., min_length=8, example="contraseñaSegura123")
+    password: str = Field(..., min_length=8, max_length=128,
+                          example="ContraseñaSegura123!")
     full_name: str | None = Field(None, max_length=100, example="María García")
+
+    @field_validator("username")
+    @classmethod
+    def normalize_username(cls, value: str) -> str:
+        return value.strip().lower()
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, value: EmailStr) -> EmailStr:
+        return EmailStr(str(value).strip().lower())
+
+    @field_validator("password")
+    @classmethod
+    def validate_password_strength(cls, value: str) -> str:
+        if not any(char.isupper() for char in value):
+            raise ValueError("La contraseña debe incluir una letra mayúscula")
+        if not any(char.islower() for char in value):
+            raise ValueError("La contraseña debe incluir una letra minúscula")
+        if not any(char.isdigit() for char in value):
+            raise ValueError("La contraseña debe incluir un número")
+        if not any(not char.isalnum() for char in value):
+            raise ValueError("La contraseña debe incluir un símbolo")
+        return value
 
 
 class UserUpdate(BaseModel):
@@ -42,7 +67,13 @@ class UserMe(UserPublic):
 
 class LoginRequest(BaseModel):
     email: EmailStr = Field(..., example="poeta@ejemplo.com")
-    password: str = Field(..., example="contraseñaSegura123")
+    password: str = Field(..., min_length=1, max_length=128,
+                          example="ContraseñaSegura123!")
+
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, value: EmailStr) -> EmailStr:
+        return EmailStr(str(value).strip().lower())
 
 
 class TokenResponse(BaseModel):

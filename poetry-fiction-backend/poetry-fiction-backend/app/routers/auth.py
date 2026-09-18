@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -37,7 +38,14 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
         full_name=payload.full_name,
     )
     db.add(user)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="El correo o nombre de usuario ya está registrado",
+        ) from None
     db.refresh(user)
 
     token = create_access_token({"sub": str(user.id)})

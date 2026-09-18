@@ -1,4 +1,5 @@
-import { BrowserRouter, Navigate, Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
+import { BrowserRouter, Navigate, Routes, Route, useNavigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import { ModalProvider } from './context/ModalContext.jsx';
@@ -19,6 +20,18 @@ function ProtectedRoute({ children }) {
   return token ? children : <Navigate to="/login" replace />;
 }
 
+function SessionExpiryHandler() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleSessionExpiry = () => navigate('/login', { replace: true });
+    window.addEventListener('pf-auth-expired', handleSessionExpiry);
+    return () => window.removeEventListener('pf-auth-expired', handleSessionExpiry);
+  }, [navigate]);
+
+  return null;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -26,6 +39,7 @@ function App() {
         <Starfield />
 
         <BrowserRouter>
+          <SessionExpiryHandler />
           <Navbar />
 
           <main className="app-main">

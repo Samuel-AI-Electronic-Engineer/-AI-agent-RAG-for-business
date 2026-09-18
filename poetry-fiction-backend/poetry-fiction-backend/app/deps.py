@@ -28,7 +28,12 @@ def get_current_user(
     if user_id is None:
         raise credentials_exception
 
-    user = db.query(User).filter(User.id == int(user_id)).first()
+    try:
+        user_id = int(user_id)
+    except (TypeError, ValueError):
+        raise credentials_exception from None
+
+    user = db.query(User).filter(User.id == user_id).first()
     if user is None or not user.is_active:
         raise credentials_exception
 
@@ -42,4 +47,3 @@ def get_current_admin(current_user: User = Depends(get_current_user)) -> User:
             detail="No tienes permisos de administrador",
         )
     return current_user
-    
