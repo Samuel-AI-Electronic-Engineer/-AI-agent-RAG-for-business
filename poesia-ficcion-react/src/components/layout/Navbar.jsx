@@ -2,11 +2,13 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import useAuthStore from '../../store/authStore';
 import { useModal } from '../../context/useModal';
+import { useStore } from '../../context/useStore';
 
 function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
-    const { user, logout } = useAuthStore();
+    const { user } = useAuthStore();
     const { openModal } = useModal();
+    const { cartCount, setIsCartOpen } = useStore();
 
     const toggleMenu = () => setIsOpen((current) => !current);
     const closeMenu = () => setIsOpen(false);
@@ -14,10 +16,6 @@ function Navbar() {
     return (
         <nav>
             <div className="inner">
-                <a href="#hero" className="nav-logo">
-                    Poesía <span>& Ficción</span>
-                </a>
-
                 <button
                     type="button"
                     className="nav-toggle"
@@ -27,6 +25,10 @@ function Navbar() {
                 >
                     ☰
                 </button>
+
+                <NavLink to="/" className="nav-logo" onClick={closeMenu}>
+                    Poesía <span>& Ficción</span>
+                </NavLink>
 
                 <div className={`nav-links${isOpen ? ' open' : ''}`}>
                     <a href="#poemas" onClick={closeMenu}>
@@ -38,18 +40,26 @@ function Navbar() {
                     <a href="#newsletter" onClick={closeMenu}>
                         Newsletter
                     </a>
+                    <NavLink to="/libreria" onClick={closeMenu}>
+                        Librería
+                    </NavLink>
                     {user && (
-                        <NavLink to="/dashboard" onClick={closeMenu}>
-                            Dashboard
-                        </NavLink>
+                        <>
+                            <NavLink to="/dashboard" onClick={closeMenu}>Perfil</NavLink>
+                            {user.is_admin && <NavLink to="/libreria/edit/" onClick={closeMenu}>Administrar librería</NavLink>}
+                        </>
                     )}
                 </div>
 
                 <div className="nav-actions">
+                    <button type="button" className="nav-cart-button" onClick={() => setIsCartOpen(true)} aria-label="Abrir canasta">
+                        ♡ <span>{cartCount}</span>
+                    </button>
                     {user ? (
-                        <button type="button" className="btn-ghost" onClick={() => { logout(); closeMenu(); }}>
-                            Salir
-                        </button>
+                        <NavLink to="/dashboard" className="user-profile-button" onClick={closeMenu} aria-label="Abrir mi perfil" title="Mi perfil">
+                            <span className="user-profile-icon">♙</span>
+                            <span className="user-profile-name">{user.username}</span>
+                        </NavLink>
                     ) : (
                         <>
                             <button

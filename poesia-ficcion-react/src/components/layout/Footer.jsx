@@ -8,7 +8,7 @@ function Footer() {
                     <li><a href="#poemas">Poemas</a></li>
                     <li><a href="#featured">Destacado</a></li>
                     <li><a href="#newsletter">Newsletter</a></li>
-                    <li><a href="#hero">Inicio</a></li>
+                    <li><a href="/">Inicio</a></li>
                 </ul>
                 <p className="footer-copy">© 2026 Poesía y Ficción · Hecho con amor y polvo de estrellas ✦</p>
             </div>

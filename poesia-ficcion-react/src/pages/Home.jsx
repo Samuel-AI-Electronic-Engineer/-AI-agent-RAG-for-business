@@ -4,9 +4,13 @@ import { getPostStats, getPosts } from '../services/postsService';
 import PoemCard from '../components/poems/PoemCard';
 import Footer from '../components/layout/Footer';
 import { useModal } from '../context/useModal';
+import { useNavigate } from 'react-router-dom';
+import useAuthStore from '../store/authStore';
 
 function Home() {
     const { openModal } = useModal();
+    const navigate = useNavigate();
+    const user = useAuthStore((state) => state.user);
     const [newsletterEmail, setNewsletterEmail] = useState('');
     const [newsletterMessage, setNewsletterMessage] = useState('');
     const statsRef = useRef(null);
@@ -99,6 +103,22 @@ function Home() {
         document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
     };
 
+    const handlePublishClick = () => {
+        if (user) {
+            navigate('/dashboard');
+            return;
+        }
+        openModal('register');
+    };
+
+    const handleUniverseClick = () => {
+        if (user) {
+            navigate('/libreria');
+            return;
+        }
+        openModal('register');
+    };
+
     return (
         <main>
             <section id="hero">
@@ -117,7 +137,7 @@ function Home() {
                             <button type="button" className="btn-primary" onClick={() => scrollToSection('poemas')}>
                                 Explorar el universo
                             </button>
-                            <button type="button" className="btn-ghost" onClick={() => openModal('register')}>
+                            <button type="button" className="btn-ghost" onClick={handlePublishClick}>
                                 Publicar mi obra
                             </button>
                         </div>
@@ -260,7 +280,7 @@ function Home() {
                     </div>
 
                     <div className="reveal" style={{ textAlign: 'center', marginTop: '3rem' }}>
-                        <button type="button" className="btn-ghost" onClick={() => openModal('register')}>
+                        <button type="button" className="btn-ghost" onClick={handleUniverseClick}>
                             Ver todo el universo →
                         </button>
                     </div>
