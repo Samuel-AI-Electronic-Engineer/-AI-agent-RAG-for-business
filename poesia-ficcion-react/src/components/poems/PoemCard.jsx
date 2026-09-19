@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 function PoemCard({ poem }) {
     return (
         <article className="poem-card">
@@ -14,6 +16,12 @@ function PoemCard({ poem }) {
                 <span>✦ {poem.author?.full_name || poem.author?.username || 'Anónimo'}</span>
                 <span>⊙ {poem.views ?? 0} lecturas</span>
             </footer>
+
+            <div style={{ marginTop: '1rem' }}>
+                <Link to={`/poema/${poem.id}`} className="btn-ghost" style={{ display: 'inline-block', width: 'auto', padding: '0.6rem 1rem' }}>
+                    Leer más
+                </Link>
+            </div>
         </article>
     );
 }

@@ -45,8 +45,8 @@ function Navbar() {
                     </NavLink>
                     {user && (
                         <>
-                            <NavLink to="/dashboard" onClick={closeMenu}>Perfil</NavLink>
-                            {user.is_admin && <NavLink to="/libreria/edit/" onClick={closeMenu}>Administrar librería</NavLink>}
+                            <NavLink to="/dashboard" onClick={closeMenu}>Mi perfil</NavLink>
+                            {user.is_admin && <NavLink to="/admin" onClick={closeMenu}>Administración</NavLink>}
                         </>
                     )}
                 </div>
@@ -55,12 +55,7 @@ function Navbar() {
                     <button type="button" className="nav-cart-button" onClick={() => setIsCartOpen(true)} aria-label="Abrir canasta">
                         ♡ <span>{cartCount}</span>
                     </button>
-                    {user ? (
-                        <NavLink to="/dashboard" className="user-profile-button" onClick={closeMenu} aria-label="Abrir mi perfil" title="Mi perfil">
-                            <span className="user-profile-icon">♙</span>
-                            <span className="user-profile-name">{user.username}</span>
-                        </NavLink>
-                    ) : (
+                    {!user && (
                         <>
                             <button
                                 type="button"
