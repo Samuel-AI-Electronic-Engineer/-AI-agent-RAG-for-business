@@ -11,10 +11,11 @@ function Dashboard() {
     const setUser = useAuthStore((state) => state.setUser);
     const logout = useAuthStore((state) => state.logout);
     const { cartCount, cartTotal, orders, products, setIsCartOpen } = useStore();
-    const purchasedIds = new Set(orders.flatMap((order) => order.items.map((item) => item.id)));
-    const purchasedCategories = new Set(orders.flatMap((order) => order.items.map((item) => item.category)));
+    const effectiveOrders = orders;
+    const purchasedIds = new Set(effectiveOrders.flatMap((order) => order.items.map((item) => item.product_id ?? item.id)));
+    const purchasedCategories = new Set(effectiveOrders.flatMap((order) => order.items.map((item) => item.category)));
     const recommendations = products.filter((product) => !purchasedIds.has(product.id) && (purchasedCategories.size === 0 || purchasedCategories.has(product.category))).slice(0, 3);
-    const pendingOrders = orders.filter((order) => order.status !== 'Entregado');
+    const pendingOrders = effectiveOrders.filter((order) => order.status !== 'entregado' && order.status !== 'Entregado');
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
@@ -90,7 +91,7 @@ function Dashboard() {
                     <h1>Hola, <em>{user.full_name || user.username}</em>.</h1>
                     <p>Un lugar para guardar tus lecturas, publicar tus palabras y seguir tu recorrido por el cosmos literario.</p>
                 </div>
-                    <Link to="/libreria" className="btn-primary profile-store-link">Visitar librería</Link>
+                <Link to="/libreria" className="btn-primary profile-store-link">Visitar librería</Link>
             </section>
 
             <div className="profile-grid">
@@ -212,7 +213,7 @@ function Dashboard() {
                 <section className="dashboard-card profile-card">
                     <p className="store-kicker">Mis pedidos</p>
                     <h2>{pendingOrders.length} pendientes</h2>
-                    {pendingOrders.length === 0 ? <p>Aquí aparecerán tus pedidos cuando completes una compra.</p> : pendingOrders.slice(0, 3).map((order) => <div className="order-row" key={order.id}><span>{order.id}<small>{new Date(order.date).toLocaleDateString('es-CO')}</small></span><strong>{order.status}</strong></div>)}
+                    {pendingOrders.length === 0 ? <p>Aquí aparecerán tus pedidos cuando completes una compra.</p> : pendingOrders.slice(0, 3).map((order) => <div className="order-row" key={order.id}><span>{order.id}<small>{new Date(order.created_at || order.date).toLocaleDateString('es-CO')}</small></span><strong>{order.status}</strong></div>)}
                 </section>
                 <section className="dashboard-card profile-card">
                     <p className="store-kicker">Para seguir leyendo</p>

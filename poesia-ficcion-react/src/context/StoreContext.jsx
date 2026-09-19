@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StoreContext } from './StoreContextDef';
+import api from '../config/api';
 
 const starterProducts = [
     {
@@ -46,11 +47,36 @@ const readStorage = (key, fallback) => {
     }
 };
 
+const normalizeProduct = (product) => ({
+    ...product,
+    price: Number(product.price),
+    stock: Number(product.stock),
+});
+
 export function StoreProvider({ children }) {
     const [products, setProducts] = useState(() => readStorage('pf_products', starterProducts));
     const [cart, setCart] = useState(() => readStorage('pf_cart', []));
     const [orders, setOrders] = useState(() => readStorage('pf_orders', []));
     const [isCartOpen, setIsCartOpen] = useState(false);
+
+    useEffect(() => {
+        let cancelled = false;
+        api.get('/products')
+            .then(({ data }) => {
+                if (!cancelled && Array.isArray(data)) {
+                    const normalizedProducts = data.map(normalizeProduct);
+                    setProducts(normalizedProducts);
+                    setCart((current) => current.map((item) => {
+                        const persistedProduct = normalizedProducts.find((product) => product.title === item.title);
+                        return persistedProduct ? { ...item, id: persistedProduct.id, price: persistedProduct.price, stock: persistedProduct.stock } : item;
+                    }));
+                }
+            })
+            .catch(() => {
+                // Keep the local catalog available while the API is offline.
+            });
+        return () => { cancelled = true; };
+    }, []);
 
     useEffect(() => {
         localStorage.setItem('pf_products', JSON.stringify(products));
@@ -64,8 +90,11 @@ export function StoreProvider({ children }) {
         localStorage.setItem('pf_orders', JSON.stringify(orders));
     }, [orders]);
 
-    const addProduct = (product) => {
-        setProducts((current) => [{ ...product, id: `book-${Date.now()}` }, ...current]);
+    const addProduct = async (product) => {
+        const { data } = await api.post('/products', product);
+        const normalizedProduct = normalizeProduct(data);
+        setProducts((current) => [normalizedProduct, ...current]);
+        return normalizedProduct;
     };
 
     const addToCart = (product) => {
@@ -87,19 +116,19 @@ export function StoreProvider({ children }) {
 
     const removeFromCart = (productId) => setCart((current) => current.filter((item) => item.id !== productId));
     const clearCart = () => setCart([]);
-    const placeOrder = (paymentMethod, shippingAddress, orderId, orderDate) => {
-        const order = {
-            id: orderId,
-            date: orderDate,
-            status: 'Pendiente de preparación',
-            paymentMethod,
-            shippingAddress,
-            items: cart,
-            total: cartTotal,
-        };
-        setOrders((current) => [order, ...current]);
+    const placeOrder = async (paymentMethod, shippingAddress) => {
+        const { data } = await api.post('/orders', {
+            payment_method: paymentMethod,
+            shipping_address: shippingAddress,
+            items: cart.map((item) => ({ product_id: Number(item.id), quantity: item.quantity })),
+        });
+        setOrders((current) => [data, ...current]);
         setCart([]);
-        return order;
+        setProducts((current) => current.map((product) => {
+            const purchased = data.items.find((item) => item.product_id === product.id);
+            return purchased ? { ...product, stock: product.stock - purchased.quantity } : product;
+        }));
+        return data;
     };
     const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
     const cartTotal = cart.reduce((total, item) => total + item.price * item.quantity, 0);

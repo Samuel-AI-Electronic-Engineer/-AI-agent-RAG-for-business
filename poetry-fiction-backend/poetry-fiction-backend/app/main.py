@@ -7,8 +7,9 @@ from app.core.config import get_settings
 from app.core.security import hash_password
 from app.database import Base, engine, check_db_connection, SessionLocal
 from app.models.post import ContentType, Post
+from app.models.product import Product
 from app.models.user import User
-from app.routers import auth_router, users_router, posts_router
+from app.routers import auth_router, users_router, posts_router, admin_router, store_router, orders_router
 
 settings = get_settings()
 
@@ -19,15 +20,14 @@ def create_dev_seed_data() -> None:
         return
 
     with SessionLocal() as db:
-        if db.query(Post).count() > 0:
-            return
-
         demo_user = db.query(User).filter(
-            User.email == "demo@poesia.local").first()
+            User.email.in_(["demo@poesia.com", "demo@poesia.local"])).first()
+        if demo_user and demo_user.email == "demo@poesia.local":
+            demo_user.email = "demo@poesia.com"
         if not demo_user:
             demo_user = User(
                 username="poeta_demo",
-                email="demo@poesia.local",
+                email="demo@poesia.com",
                 hashed_password=hash_password("Demo12345!"),
                 full_name="Poeta Demo",
             )
@@ -68,9 +68,22 @@ def create_dev_seed_data() -> None:
             },
         ]
 
-        for post_data in sample_posts:
-            if not db.query(Post).filter(Post.title == post_data["title"]).first():
-                db.add(Post(author_id=demo_user.id, **post_data))
+        if db.query(Post).count() == 0:
+            for post_data in sample_posts:
+                if not db.query(Post).filter(Post.title == post_data["title"]).first():
+                    db.add(Post(author_id=demo_user.id, **post_data))
+
+        sample_products = [
+            {"title": "La luna entre la tinta", "author": "Poesía y Ficción", "description": "Una edición íntima de poemas sobre la noche, la memoria y todo lo que todavía nos nombra.",
+                "price": 24.90, "format": "Edición impresa", "category": "Poesía", "accent": "gold", "stock": 12},
+            {"title": "La ciudad del silencio", "author": "Marina Soler", "description": "Relatos breves para caminar por ciudades imaginarias y encontrar una voz en cada esquina.",
+                "price": 19.50, "format": "Edición digital", "category": "Ficción", "accent": "rose", "stock": 30},
+            {"title": "Constelaciones domésticas", "author": "Nicolás Vega", "description": "Ensayos mínimos sobre crear, leer y sostener una vida alrededor de los libros.",
+                "price": 28.00, "format": "Edición de autor", "category": "Ensayo", "accent": "teal", "stock": 8},
+        ]
+        if db.query(Product).count() == 0:
+            for product_data in sample_products:
+                db.add(Product(**product_data))
 
         db.commit()
         print("✅ Datos de ejemplo creados para el modo DEBUG")
@@ -128,6 +141,9 @@ API_PREFIX = "/api/v1"
 app.include_router(auth_router,  prefix=API_PREFIX)
 app.include_router(users_router, prefix=API_PREFIX)
 app.include_router(posts_router, prefix=API_PREFIX)
+app.include_router(admin_router, prefix=API_PREFIX)
+app.include_router(store_router, prefix=API_PREFIX)
+app.include_router(orders_router, prefix=API_PREFIX)
 
 
 # ─── HEALTH CHECK ────────────────────────────────────────────

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useStore } from '../../context/useStore';
 
 function CartDrawer() {
@@ -16,19 +17,22 @@ function CartDrawer() {
     const [paymentMethod, setPaymentMethod] = useState('Tarjeta débito o crédito');
     const [shippingAddress, setShippingAddress] = useState('');
     const [confirmation, setConfirmation] = useState('');
+    const [checkoutError, setCheckoutError] = useState('');
+    const queryClient = useQueryClient();
 
-    const handleCheckout = (event) => {
+    const handleCheckout = async (event) => {
         event.preventDefault();
         if (!shippingAddress.trim()) return;
-        const order = placeOrder(
-            paymentMethod,
-            shippingAddress.trim(),
-            `PF-${Date.now().toString().slice(-8)}`,
-            new Date().toISOString(),
-        );
-        setConfirmation(`Pedido ${order.id} registrado correctamente.`);
-        setIsCheckoutOpen(false);
-        setShippingAddress('');
+        setCheckoutError('');
+        try {
+            const order = await placeOrder(paymentMethod, shippingAddress.trim());
+            queryClient.invalidateQueries({ queryKey: ['orders', 'mine'] });
+            setConfirmation(`Pedido #${order.id} registrado correctamente.`);
+            setIsCheckoutOpen(false);
+            setShippingAddress('');
+        } catch (error) {
+            setCheckoutError(error.response?.data?.detail || 'No fue posible registrar el pedido. Revisa el stock e inténtalo de nuevo.');
+        }
     };
 
     if (!isCartOpen) return null;
@@ -97,6 +101,7 @@ function CartDrawer() {
                                 <textarea rows="3" value={shippingAddress} onChange={(event) => setShippingAddress(event.target.value)} placeholder="Ciudad, dirección y referencias" required />
                             </label>
                             <div className="checkout-total"><span>Total</span><strong>${cartTotal.toFixed(2)}</strong></div>
+                            {checkoutError && <p className="status-text error" role="alert">{checkoutError}</p>}
                             <button type="submit" className="btn-primary checkout-button">Confirmar pedido</button>
                         </form>
                     </div>

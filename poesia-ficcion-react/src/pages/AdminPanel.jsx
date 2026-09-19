@@ -1,4 +1,6 @@
 import { Navigate, NavLink, Route, Routes } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import api from '../config/api';
 import useAuthStore from '../store/authStore';
 
 const adminSections = [
@@ -10,26 +12,15 @@ const adminSections = [
     { to: '/admin/configuracion', label: 'Configuración', description: 'Preferencias', icon: '⚙' },
 ];
 
-const mockUsers = [
-    { id: 1, name: 'Ana Torres', role: 'Admin', status: 'Activo', lastLogin: 'Hace 2 horas' },
-    { id: 2, name: 'Mateo Ruiz', role: 'Editor', status: 'Activo', lastLogin: 'Hace 6 horas' },
-    { id: 3, name: 'Lucía Gómez', role: 'Lector', status: 'Pendiente', lastLogin: 'Hoy' },
-    { id: 4, name: 'Daniel Peña', role: 'Moderador', status: 'Activo', lastLogin: 'Ayer' },
-];
+function useAdminStats() {
+    return useQuery({ queryKey: ['admin', 'stats'], queryFn: async () => (await api.get('/admin/stats')).data });
+}
 
-const mockPosts = [
-    { id: 101, title: 'Voces bajo la lluvia', author: 'Ana Torres', status: 'Publicado', views: 1234 },
-    { id: 102, title: 'Piedra de amanecer', author: 'Mateo Ruiz', status: 'Revisión', views: 842 },
-    { id: 103, title: 'Bajo la luna de vidrio', author: 'Lucía Gómez', status: 'Borrador', views: 321 },
-    { id: 104, title: 'Cartografía de la duda', author: 'Daniel Peña', status: 'Publicado', views: 942 },
-];
-
-const adminCards = [
-    { label: 'Usuarios activos', value: '1.284', hint: '+12% vs. semana pasada' },
-    { label: 'Publicaciones', value: '328', hint: '18 pendientes de revisión' },
-    { label: 'Ventas', value: '$14.2K', hint: 'Crecimiento de 9.4%' },
-    { label: 'Tasa de lectura', value: '68%', hint: 'Satisfacción alta' },
-];
+function AdminQueryState({ query, children }) {
+    if (query.isLoading) return <p className="panel-feedback">Cargando datos administrativos...</p>;
+    if (query.isError) return <p className="panel-feedback error">No fue posible cargar estos datos. Verifica la conexión con el backend.</p>;
+    return children;
+}
 
 function AdminSidebar() {
     return (
@@ -63,6 +54,15 @@ function AdminSidebar() {
 }
 
 function OverviewPage() {
+    const statsQuery = useAdminStats();
+    const stats = statsQuery.data;
+    const adminCards = stats ? [
+        { label: 'Usuarios activos', value: stats.users.active, hint: `${stats.users.total} usuarios registrados` },
+        { label: 'Publicaciones', value: stats.posts.total, hint: `${stats.posts.published} publicadas` },
+        { label: 'Pendientes', value: stats.posts.pending, hint: 'En cola de moderación' },
+        { label: 'Lecturas', value: stats.posts.views, hint: 'Vistas acumuladas' },
+    ] : [];
+
     return (
         <section className="panel-section">
             <div className="panel-header">
@@ -73,15 +73,17 @@ function OverviewPage() {
                 <button type="button" className="btn-primary panel-action">Exportar reporte</button>
             </div>
 
-            <div className="metric-grid">
-                {adminCards.map((card) => (
-                    <article key={card.label} className="metric-card">
-                        <p>{card.label}</p>
-                        <h3>{card.value}</h3>
-                        <span>{card.hint}</span>
-                    </article>
-                ))}
-            </div>
+            <AdminQueryState query={statsQuery}>
+                <div className="metric-grid">
+                    {adminCards.map((card) => (
+                        <article key={card.label} className="metric-card">
+                            <p>{card.label}</p>
+                            <h3>{card.value}</h3>
+                            <span>{card.hint}</span>
+                        </article>
+                    ))}
+                </div>
+            </AdminQueryState>
 
             <div className="admin-grid">
                 <article className="panel-card">
@@ -106,12 +108,14 @@ function OverviewPage() {
                             <h2>Qué revisar hoy</h2>
                         </div>
                     </div>
-                    <ul className="checklist">
-                        <li>Validar nuevas piezas en revisión editorial.</li>
-                        <li>Revisar el inventario de la librería y precios.</li>
-                        <li>Confirmar pedidos con estado de preparación.</li>
-                        <li>Revisar desempeño de campañas de newsletter.</li>
-                    </ul>
+                    <AdminQueryState query={statsQuery}>
+                        <ul className="checklist">
+                            <li>{stats?.posts.pending || 0} publicaciones pendientes de revisión.</li>
+                            <li>{stats?.users.total || 0} usuarios registrados en la plataforma.</li>
+                            <li>{stats?.posts.published || 0} publicaciones disponibles públicamente.</li>
+                            <li>{stats?.posts.views || 0} lecturas acumuladas para analizar.</li>
+                        </ul>
+                    </AdminQueryState>
                 </article>
             </div>
         </section>
@@ -119,6 +123,14 @@ function OverviewPage() {
 }
 
 function UsersPage() {
+    const queryClient = useQueryClient();
+    const usersQuery = useQuery({ queryKey: ['admin', 'users'], queryFn: async () => (await api.get('/admin/users')).data });
+    const users = usersQuery.data || [];
+    const updateUserMutation = useMutation({
+        mutationFn: ({ userId, payload }) => api.patch(`/admin/users/${userId}`, payload),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
+    });
+
     return (
         <section className="panel-section">
             <div className="panel-header">
@@ -135,26 +147,41 @@ function UsersPage() {
                             <th>Usuario</th>
                             <th>Rol</th>
                             <th>Estado</th>
-                            <th>Último acceso</th>
+                            <th>Registro</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {mockUsers.map((user) => (
+                        {users.map((user) => (
                             <tr key={user.id}>
-                                <td>{user.name}</td>
-                                <td>{user.role}</td>
-                                <td><span className={`status-pill ${user.status === 'Activo' ? 'success' : 'warning'}`}>{user.status}</span></td>
-                                <td>{user.lastLogin}</td>
+                                <td>{user.full_name || user.username}<small className="table-secondary">{user.email}</small></td>
+                                <td>{user.is_admin ? 'Admin' : 'Lector'}</td>
+                                <td><span className={`status-pill ${user.is_active ? 'success' : 'warning'}`}>{user.is_active ? 'Activo' : 'Inactivo'}</span></td>
+                                <td>{new Date(user.created_at).toLocaleDateString('es-CO')}</td>
+                                <td><div className="table-actions"><button type="button" className="table-action-button" onClick={() => updateUserMutation.mutate({ userId: user.id, payload: { is_active: !user.is_active } })} disabled={updateUserMutation.isPending}>{user.is_active ? 'Desactivar' : 'Activar'}</button><button type="button" className="table-action-button" onClick={() => updateUserMutation.mutate({ userId: user.id, payload: { is_admin: !user.is_admin } })} disabled={updateUserMutation.isPending}>{user.is_admin ? 'Quitar admin' : 'Hacer admin'}</button></div></td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                <AdminQueryState query={usersQuery}>{users.length === 0 && <p className="panel-feedback">No hay usuarios registrados.</p>}</AdminQueryState>
             </div>
         </section>
     );
 }
 
 function PublicationsPage() {
+    const queryClient = useQueryClient();
+    const postsQuery = useQuery({ queryKey: ['admin', 'posts'], queryFn: async () => (await api.get('/admin/posts')).data });
+    const posts = postsQuery.data?.items || [];
+    const moderateMutation = useMutation({
+        mutationFn: ({ postId, isPublished }) => api.patch(`/admin/posts/${postId}/publication`, null, { params: { is_published: isPublished } }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'posts'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'moderation'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+        },
+    });
+
     return (
         <section className="panel-section">
             <div className="panel-header">
@@ -172,25 +199,31 @@ function PublicationsPage() {
                             <th>Autor</th>
                             <th>Estado</th>
                             <th>Lecturas</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {mockPosts.map((post) => (
+                        {posts.map((post) => (
                             <tr key={post.id}>
                                 <td>{post.title}</td>
-                                <td>{post.author}</td>
-                                <td><span className={`status-pill ${post.status === 'Publicado' ? 'success' : post.status === 'Revisión' ? 'warning' : 'neutral'}`}>{post.status}</span></td>
+                                <td>{post.author?.full_name || post.author?.username}</td>
+                                <td><span className={`status-pill ${post.is_published ? 'success' : 'warning'}`}>{post.is_published ? 'Publicado' : 'Pendiente'}</span></td>
                                 <td>{post.views}</td>
+                                <td><button type="button" className="table-action-button" onClick={() => moderateMutation.mutate({ postId: post.id, isPublished: !post.is_published })} disabled={moderateMutation.isPending}>{post.is_published ? 'Retirar' : 'Publicar'}</button></td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+                <AdminQueryState query={postsQuery}>{posts.length === 0 && <p className="panel-feedback">No hay publicaciones registradas.</p>}</AdminQueryState>
             </div>
         </section>
     );
 }
 
 function StatsPage() {
+    const statsQuery = useAdminStats();
+    const stats = statsQuery.data;
+
     return (
         <section className="panel-section">
             <div className="panel-header">
@@ -199,17 +232,31 @@ function StatsPage() {
                     <h1>Rendimiento general</h1>
                 </div>
             </div>
-            <div className="metric-grid">
-                <article className="metric-card"><p>Tiempo promedio</p><h3>4m 28s</h3><span>Lectura por sesión</span></article>
-                <article className="metric-card"><p>Retención</p><h3>74%</h3><span>Usuarios activos 30 días</span></article>
-                <article className="metric-card"><p>Conversión</p><h3>12.8%</h3><span>Visitantes compran alguna edición</span></article>
-                <article className="metric-card"><p>Newsletter</p><h3>8.4%</h3><span>CTR sobre campañas</span></article>
-            </div>
+            <AdminQueryState query={statsQuery}>
+                <div className="metric-grid">
+                    <article className="metric-card"><p>Usuarios totales</p><h3>{stats?.users.total}</h3><span>{stats?.users.active} activos</span></article>
+                    <article className="metric-card"><p>Administradores</p><h3>{stats?.users.admins}</h3><span>Roles con privilegios</span></article>
+                    <article className="metric-card"><p>Publicaciones</p><h3>{stats?.posts.total}</h3><span>{stats?.posts.published} publicadas</span></article>
+                    <article className="metric-card"><p>Lecturas</p><h3>{stats?.posts.views}</h3><span>Vistas acumuladas</span></article>
+                </div>
+            </AdminQueryState>
         </section>
     );
 }
 
 function ModerationPage() {
+    const queryClient = useQueryClient();
+    const moderationQuery = useQuery({ queryKey: ['admin', 'moderation'], queryFn: async () => (await api.get('/admin/moderation')).data });
+    const pendingPosts = moderationQuery.data || [];
+    const approveMutation = useMutation({
+        mutationFn: (postId) => api.patch(`/admin/posts/${postId}/publication`, null, { params: { is_published: true } }),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['admin', 'moderation'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'posts'] });
+            queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
+        },
+    });
+
     return (
         <section className="panel-section">
             <div className="panel-header">
@@ -221,17 +268,15 @@ function ModerationPage() {
             <div className="admin-grid">
                 <article className="panel-card">
                     <div className="panel-card-head"><h2>Alertas</h2></div>
-                    <ul className="checklist">
-                        <li>Dos publicaciones con reportes repetidos.</li>
-                        <li>Un comentario marcado como spam.</li>
-                        <li>Una tienda con stock bajo.</li>
-                    </ul>
+                    <AdminQueryState query={moderationQuery}>
+                        {pendingPosts.length === 0 ? <p className="panel-feedback">No hay publicaciones pendientes.</p> : <ul className="checklist">{pendingPosts.map((post) => <li key={post.id}><span><strong>{post.title}</strong> · {post.author?.full_name || post.author?.username}</span><button type="button" className="table-action-button" onClick={() => approveMutation.mutate(post.id)} disabled={approveMutation.isPending}>Aprobar</button></li>)}</ul>}
+                    </AdminQueryState>
                 </article>
                 <article className="panel-card">
                     <div className="panel-card-head"><h2>Tránsito</h2></div>
                     <div className="activity-list">
-                        <div><strong>03</strong><span>Casos pendientes de revisión</span></div>
-                        <div><strong>11</strong><span>Reportes resueltos hoy</span></div>
+                        <div><strong>{pendingPosts.length}</strong><span>Publicaciones pendientes</span></div>
+                        <div><strong>--</strong><span>Reportes de usuarios no disponibles aún</span></div>
                     </div>
                 </article>
             </div>

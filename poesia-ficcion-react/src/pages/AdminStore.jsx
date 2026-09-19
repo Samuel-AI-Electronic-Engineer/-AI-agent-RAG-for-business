@@ -19,7 +19,7 @@ function AdminStore() {
 
     const updateField = (field, value) => setNewProduct((current) => ({ ...current, [field]: value }));
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
         const price = Number(newProduct.price);
         const stock = Number(newProduct.stock);
@@ -28,16 +28,20 @@ function AdminStore() {
             return;
         }
 
-        addProduct({
-            ...newProduct,
-            title: newProduct.title.trim(),
-            author: newProduct.author.trim(),
-            description: newProduct.description.trim(),
-            price,
-            stock,
-        });
-        setNewProduct(emptyProduct);
-        setMessage('Libro publicado en el catálogo público.');
+        try {
+            await addProduct({
+                ...newProduct,
+                title: newProduct.title.trim(),
+                author: newProduct.author.trim(),
+                description: newProduct.description.trim(),
+                price,
+                stock,
+            });
+            setNewProduct(emptyProduct);
+            setMessage('Libro publicado en el catálogo público.');
+        } catch (error) {
+            setMessage(error.response?.data?.detail || 'No fue posible publicar el libro.');
+        }
     };
 
     return (

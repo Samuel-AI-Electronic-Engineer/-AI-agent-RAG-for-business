@@ -758,155 +758,184 @@ footer {
 
 .form-group {
     display: grid;
-.profile-subpage {
-    max-width: 980px;
-}
-.subpage-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-.subpage-heading h1 {
-    margin: 0;
-    color: #fff;
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(2.2rem, 6vw, 3.8rem);
-}
-.subpage-heading h1 em {
-    color: var(--gold);
-    font-style: italic;
-}
-.subpage-heading p:last-child {
-    max-width: 620px;
-    margin-bottom: 0;
-    color: var(--text-dim);
-}
-.subpage-action {
-    width: auto;
-    flex-shrink: 0;
-}
-.subpage-card {
-    max-width: none;
-    margin: 0;
-}
-.subpage-card-heading {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    margin-bottom: 1.25rem;
-}
-.subpage-card-heading h2 {
-    margin: 0;
-    color: #fff;
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 1.7rem;
-    font-style: italic;
-}
-.compact-button {
-    display: inline-block;
-    width: auto;
-    padding: 0.55rem 0.9rem;
-}
-.publication-list,
-.order-list {
-    display: grid;
-    gap: 0.7rem;
-}
-.publication-row,
-.order-row-large {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-}
-.publication-row h3 {
-    margin: 0.2rem 0;
-    color: #fff;
-}
-.publication-row span,
-.order-row-large,
-.recommendation-card span {
-    color: var(--text-dim);
-    font-size: 0.88rem;
-}
-.publication-type,
-.recommendation-card p {
-    margin: 0;
-    color: var(--gold);
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-}
-.row-actions {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
-.danger-button {
-    color: #ff9aa7;
-}
-.empty-state {
-    display: grid;
-    justify-items: start;
-    gap: 0.75rem;
-    padding: 1rem 0;
-    color: var(--text-dim);
-}
-.order-row-large span {
-    display: grid;
-    gap: 0.25rem;
-}
-.order-row-large span:first-child strong {
-    color: #fff;
-}
-.order-row-large>strong {
-    color: var(--gold);
-}
-.recommendation-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 1rem;
-}
-.recommendation-card {
-    display: grid;
-    gap: 0.8rem;
-    padding: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 0.9rem;
-    background: rgba(255, 255, 255, 0.02);
-}
-.recommendation-card h3 {
-    margin: 0.3rem 0;
-    color: #fff;
-}
-.profile-settings-form {
-    display: grid;
-    gap: 1rem;
-    max-width: 620px;
-}
-.profile-settings-form label {
-    display: grid;
-    gap: 0.45rem;
-    color: var(--silver);
-}
-.profile-settings-form input {
-    width: 100%;
-    padding: 0.8rem 1rem;
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text);
-}
-.profile-settings-form input:disabled {
-    color: var(--text-dim);
-    opacity: 0.75;
-}
+
+    .profile-subpage {
+        max-width: 980px;
+    }
+
+    .subpage-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: end;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .subpage-heading h1 {
+        margin: 0;
+        color: #fff;
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: clamp(2.2rem, 6vw, 3.8rem);
+    }
+
+    .subpage-heading h1 em {
+        color: var(--gold);
+        font-style: italic;
+    }
+
+    .subpage-heading p:last-child {
+        max-width: 620px;
+        margin-bottom: 0;
+        color: var(--text-dim);
+    }
+
+    .subpage-action {
+        width: auto;
+        flex-shrink: 0;
+    }
+
+    .subpage-card {
+        max-width: none;
+        margin: 0;
+    }
+
+    .subpage-card-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+
+    .subpage-card-heading h2 {
+        margin: 0;
+        color: #fff;
+        font-family: 'Playfair Display', Georgia, serif;
+        font-size: 1.7rem;
+        font-style: italic;
+    }
+
+    .compact-button {
+        display: inline-block;
+        width: auto;
+        padding: 0.55rem 0.9rem;
+    }
+
+    .publication-list,
+    .order-list {
+        display: grid;
+        gap: 0.7rem;
+    }
+
+    .publication-row,
+    .order-row-large {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .publication-row h3 {
+        margin: 0.2rem 0;
+        color: #fff;
+    }
+
+    .publication-row span,
+    .order-row-large,
+    .recommendation-card span {
+        color: var(--text-dim);
+        font-size: 0.88rem;
+    }
+
+    .publication-type,
+    .recommendation-card p {
+        margin: 0;
+        color: var(--gold);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .row-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .danger-button {
+        color: #ff9aa7;
+    }
+
+    .empty-state {
+        display: grid;
+        justify-items: start;
+        gap: 0.75rem;
+        padding: 1rem 0;
+        color: var(--text-dim);
+    }
+
+    .order-row-large span {
+        display: grid;
+        gap: 0.25rem;
+    }
+
+    .order-row-large span:first-child strong {
+        color: #fff;
+    }
+
+    .order-row-large>strong {
+        color: var(--gold);
+    }
+
+    .recommendation-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .recommendation-card {
+        display: grid;
+        gap: 0.8rem;
+        padding: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 0.9rem;
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .recommendation-card h3 {
+        margin: 0.3rem 0;
+        color: #fff;
+    }
+
+    .profile-settings-form {
+        display: grid;
+        gap: 1rem;
+        max-width: 620px;
+    }
+
+    .profile-settings-form label {
+        display: grid;
+        gap: 0.45rem;
+        color: var(--silver);
+    }
+
+    .profile-settings-form input {
+        width: 100%;
+        padding: 0.8rem 1rem;
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+    }
+
+    .profile-settings-form input:disabled {
+        color: var(--text-dim);
+        opacity: 0.75;
+    }
+
     gap: 0.5rem;
 }
 
@@ -2000,6 +2029,55 @@ footer {
     margin: 0.45rem 0;
     color: #fff;
     font-size: clamp(1.7rem, 3vw, 2.4rem);
+}
+
+.panel-feedback {
+    margin: 0.9rem 0 0;
+    color: var(--text-dim);
+}
+
+.panel-feedback.error {
+    color: #ff9aa7;
+}
+
+.table-secondary {
+    display: block;
+    margin-top: 0.2rem;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+
+.table-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.table-action-button {
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--silver);
+    padding: 0.4rem 0.55rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+}
+
+.table-action-button:hover:not(:disabled) {
+    border-color: var(--gold-dim);
+    color: var(--gold);
+}
+
+.table-action-button:disabled {
+    cursor: wait;
+    opacity: 0.55;
+}
+
+.checklist li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.8rem;
 }
 
 .admin-grid {

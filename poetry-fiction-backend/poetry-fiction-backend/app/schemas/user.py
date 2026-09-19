@@ -42,6 +42,11 @@ class UserUpdate(BaseModel):
     avatar_url: str | None = Field(None, max_length=500)
 
 
+class AdminUserUpdate(BaseModel):
+    is_active: bool | None = None
+    is_admin: bool | None = None
+
+
 # ─── SALIDA ───────────────────────────────────────────────────
 
 class UserPublic(BaseModel):
