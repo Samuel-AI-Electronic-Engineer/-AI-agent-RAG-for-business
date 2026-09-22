@@ -1,17 +1,22 @@
 from contextlib import asynccontextmanager
+import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.config import get_settings
 from app.core.security import hash_password
-from app.database import Base, engine, check_db_connection, SessionLocal
+from app.database import check_db_connection, SessionLocal
 from app.models.post import ContentType, Post
 from app.models.product import Product
 from app.models.user import User
 from app.routers import auth_router, users_router, posts_router, admin_router, store_router, orders_router
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 def create_dev_seed_data() -> None:
@@ -97,9 +102,6 @@ async def lifespan(_app: FastAPI):
 
     if check_db_connection():
         print("✅  Conexión a la base de datos establecida")
-        # Crea todas las tablas si no existen
-        Base.metadata.create_all(bind=engine)
-        print("✅  Tablas sincronizadas")
         create_dev_seed_data()
     else:
         print("❌  No se pudo conectar a la base de datos — revisa tu .env")
@@ -123,6 +125,53 @@ app = FastAPI(
     redoc_url="/redoc",     # ReDoc
     lifespan=lifespan,
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(_request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={"detail": exc.errors(), "error": {"code": "validation_error",
+                                                   "message": "Los datos enviados no son válidos"}},
+    )
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(_request: Request, exc: HTTPException):
+    code_by_status = {
+        401: "authentication_required",
+        403: "forbidden",
+        404: "not_found",
+        409: "conflict",
+    }
+    message = exc.detail if isinstance(
+        exc.detail, str) else "La solicitud no pudo completarse"
+    return JSONResponse(
+        status_code=exc.status_code,
+        headers=exc.headers,
+        content={"detail": exc.detail, "error": {"code": code_by_status.get(
+            exc.status_code, "http_error"), "message": message}},
+    )
+
+
+@app.exception_handler(SQLAlchemyError)
+async def database_exception_handler(_request: Request, exc: SQLAlchemyError):
+    logger.exception("Database operation failed", exc_info=exc)
+    return JSONResponse(
+        status_code=503,
+        content={"detail": "No fue posible completar la operación", "error": {
+            "code": "database_unavailable", "message": "Servicio temporalmente no disponible"}},
+    )
+
+
+@app.exception_handler(Exception)
+async def unexpected_exception_handler(_request: Request, exc: Exception):
+    logger.exception("Unhandled application error", exc_info=exc)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Ocurrió un error interno", "error": {
+            "code": "internal_error", "message": "No fue posible completar la operación"}},
+    )
 
 # ─── CORS ────────────────────────────────────────────────────
 

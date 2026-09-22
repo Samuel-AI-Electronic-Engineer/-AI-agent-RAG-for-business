@@ -1,6 +1,6 @@
 import math
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import func as sql_func, or_
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -96,14 +96,14 @@ def post_stats(db: Session = Depends(get_db)):
     published = Post.is_published == True
     counts = db.query(
         Post.content_type,
-        sql_func.count(Post.id),
+        func.count(Post.id),
     ).filter(published).group_by(Post.content_type).all()
     by_type = {content_type.value: count for content_type, count in counts}
 
     return {
         "poems": by_type.get(ContentType.POEM.value, 0),
         "stories": by_type.get(ContentType.STORY.value, 0),
-        "authors": db.query(sql_func.count(sql_func.distinct(Post.author_id))).filter(published).scalar() or 0,
+        "authors": db.query(func.count(func.distinct(Post.author_id))).filter(published).scalar() or 0,
     }
 
 

@@ -1,0 +1,422 @@
+
+<h2 class="sr-only">Resumen de frameworks y requerimientos de producción para Poesía y Ficción</h2>
+
+<style>
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem}
+  .tab{padding:6px 16px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--surface-1);color:var(--text-secondary);font-size:13px;cursor:pointer;transition:all .15s}
+  .tab.active{background:var(--fill-accent);color:var(--on-accent);border-color:var(--fill-accent)}
+  .panel{display:none}.panel.active{display:block}
+  .card{background:var(--surface-1);border:0.5px solid var(--border);border-radius:12px;padding:1rem 1.25rem;margin-bottom:10px}
+  .card-accent{border-left:3px solid var(--fill-accent);border-radius:0 12px 12px 0}
+  .card-success{border-left:3px solid var(--fill-success)}
+  .card-warning{border-left:3px solid var(--fill-warning)}
+  .card-danger{border-left:3px solid var(--fill-danger)}
+  .card-pro{border-left:3px solid var(--fill-pro)}
+  .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;border-radius:var(--radius);font-size:11px;font-weight:500;margin-left:8px}
+  .b-green{background:var(--bg-success);color:var(--text-success)}
+  .b-blue{background:var(--bg-accent);color:var(--text-accent)}
+  .b-red{background:var(--bg-danger);color:var(--text-danger)}
+  .b-yellow{background:var(--bg-warning);color:var(--text-warning)}
+  .b-purple{background:var(--bg-pro);color:var(--text-pro)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .metric{background:var(--surface-1);border:0.5px solid var(--border);border-radius:var(--radius);padding:.75rem;text-align:center}
+  .metric-num{font-size:24px;font-weight:500;color:var(--text-primary);display:block}
+  .metric-lbl{font-size:11px;color:var(--text-muted);margin-top:2px}
+  h3{font-size:16px;font-weight:500;margin:0 0 .75rem;color:var(--text-primary)}
+  h4{font-size:13px;font-weight:500;margin:0 0 .4rem;color:var(--text-primary)}
+  p,li{font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0}
+  ul{padding-left:1.2rem;margin:.25rem 0}
+  .row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .icon-wrap{width:32px;height:32px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .check-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--border)}
+  .check-item:last-child{border:none}
+  .check-box{width:18px;height:18px;border-radius:4px;border:1.5px solid var(--border-strong);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+  .check-box.done{background:var(--fill-success);border-color:var(--fill-success)}
+  .check-label{font-size:13px;color:var(--text-secondary);flex:1}
+  .check-label.done{text-decoration:line-through;color:var(--text-muted)}
+  .progress-bar{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin:.5rem 0}
+  .progress-fill{height:100%;background:var(--fill-success);border-radius:3px;transition:width .3s}
+  .tag{display:inline-block;padding:2px 8px;border-radius:var(--radius);font-size:11px;margin:2px}
+  .separator{border:none;border-top:0.5px solid var(--border);margin:.75rem 0}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  @media(max-width:500px){.grid2,.grid3,.two-col{grid-template-columns:1fr}.tabs{gap:4px}.tab{font-size:12px;padding:5px 10px}}
+</style>
+
+<div style="padding:1rem 0">
+
+<div class="tabs" id="tabs">
+  <button class="tab active" onclick="showTab('frameworks')"><i class="ti ti-stack-2" aria-hidden="true"></i> Frameworks</button>
+  <button class="tab" onclick="showTab('arquitectura')"><i class="ti ti-topology-star" aria-hidden="true"></i> Arquitectura</button>
+  <button class="tab" onclick="showTab('requerimientos')"><i class="ti ti-clipboard-check" aria-hidden="true"></i> Requerimientos</button>
+  <button class="tab" onclick="showTab('checklist')"><i class="ti ti-checklist" aria-hidden="true"></i> Checklist</button>
+  <button class="tab" onclick="showTab('deploy')"><i class="ti ti-rocket" aria-hidden="true"></i> Deploy</button>
+</div>
+
+<!-- ══ FRAMEWORKS ══ -->
+<div class="panel active" id="panel-frameworks">
+
+  <div class="grid3" style="margin-bottom:1rem">
+    <div class="metric"><span class="metric-num">11</span><span class="metric-lbl">Tecnologías activas</span></div>
+    <div class="metric"><span class="metric-num">3</span><span class="metric-lbl">Capas del sistema</span></div>
+    <div class="metric"><span class="metric-num">MVP</span><span class="metric-lbl">Estado actual</span></div>
+  </div>
+
+  <h3>Frontend — capa de presentación</h3>
+  <div class="card card-accent">
+    <div class="row">
+      <div class="icon-wrap" style="background:var(--bg-accent)"><i class="ti ti-brand-react" style="color:var(--text-accent);font-size:18px" aria-hidden="true"></i></div>
+      <div style="flex:1">
+        <h4>React 19 <span class="badge b-green">Activo</span></h4>
+        <p>Biblioteca de interfaces de usuario basada en componentes. Permite construir UIs reactivas donde el estado controla la vista automáticamente. Usa el Virtual DOM para renderizar eficientemente solo lo que cambia.</p>
+        <hr class="separator">
+        <p><strong>Rol en el proyecto:</strong> Renderiza toda la interfaz — home, modales, cards de poemas, dashboard, formularios.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-accent">
+    <div class="row">
+      <div class="icon-wrap" style="background:var(--bg-accent)"><i class="ti ti-bolt" style="color:var(--text-accent);font-size:18px" aria-hidden="true"></i></div>
+      <div style="flex:1">
+        <h4>Vite 8 <span class="badge b-green">Activo</span></h4>
+        <p>Bundler de nueva generación. Usa módulos ES nativos en desarrollo (sin empaquetar) y Rollup en producción. Arranque instantáneo y Hot Module Replacement en milisegundos.</p>
+        <hr class="separator">
+        <p><strong>Rol en el proyecto:</strong> Servidor de desarrollo, compilación optimizada para producción, gestión de assets.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card card-accent">
+    <div class="row">
+      <div class="icon-wrap" style="background:var(--bg-accent)"><i class="ti ti-route" style="color:var(--text-accent);font-size:18px" aria-hidden="true"></i></div>
+      <div style="flex:1">
+        <h4>React Router v7 <span class="badge b-green">Activo</span></h4>
+        <p>Enrutador declarativo para React. Maneja la navegación entre páginas sin recargar el navegador (SPA). Define rutas protegidas, rutas anidadas y navegación programática.</p>
+        <hr class="separator">
+        <p><strong>Rutas activas:</strong> / → /login → /register → /dashboard → /poem/:id → /publicar</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card card-accent">
+      <h4>Zustand 5 <span class="badge b-green">Activo</span></h4>
+      <p>Estado global minimalista. Gestiona el usuario autenticado y el token JWT a través de toda la app sin prop drilling.</p>
+    </div>
+    <div class="card card-accent">
+      <h4>TanStack Query 5 <span class="badge b-green">Activo</span></h4>
+      <p>Caché inteligente de peticiones al servidor. Maneja loading, error, refetch automático y sincronización en segundo plano.</p>
+    </div>
+    <div class="card card-accent">
+      <h4>Axios 1.16 <span class="badge b-green">Activo</span></h4>
+      <p>Cliente HTTP con interceptores. Inyecta el token JWT automáticamente en cada petición al backend.</p>
+    </div>
+    <div class="card card-accent">
+      <h4>Framer Motion 12 <span class="badge b-green">Activo</span></h4>
+      <p>Animaciones declarativas y fluidas. Maneja transiciones de página, aparición de cards y efectos cosmos.</p>
+    </div>
+  </div>
+
+  <hr class="separator">
+  <h3 style="margin-top:.5rem">Backend — capa de lógica</h3>
+
+  <div class="card card-pro">
+    <div class="row">
+      <div class="icon-wrap" style="background:var(--bg-pro)"><i class="ti ti-api" style="color:var(--text-pro);font-size:18px" aria-hidden="true"></i></div>
+      <div style="flex:1">
+        <h4>FastAPI 0.115 <span class="badge b-purple">Activo</span></h4>
+        <p>Framework web Python asíncrono de alto rendimiento. Genera documentación OpenAPI automática (Swagger). Usa type hints para validación automática de datos con Pydantic.</p>
+        <hr class="separator">
+        <p><strong>Endpoints activos:</strong> /auth/login · /auth/register · /users/me · /posts (CRUD completo) · /posts/featured · /health</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card card-pro">
+      <h4>SQLAlchemy 2.0 <span class="badge b-purple">Activo</span></h4>
+      <p>ORM que mapea clases Python a tablas SQL. Gestiona relaciones, migraciones y consultas de forma segura contra SQL injection.</p>
+    </div>
+    <div class="card card-pro">
+      <h4>Pydantic 2.9 <span class="badge b-purple">Activo</span></h4>
+      <p>Validación de datos con tipos Python. Esquemas de entrada y salida de la API. Serialización y deserialización automática.</p>
+    </div>
+    <div class="card card-pro">
+      <h4>Passlib + Bcrypt <span class="badge b-purple">Activo</span></h4>
+      <p>Hash irreversible de contraseñas. Nunca se guarda texto plano en la base de datos.</p>
+    </div>
+    <div class="card card-pro">
+      <h4>Python-Jose (JWT) <span class="badge b-purple">Activo</span></h4>
+      <p>Generación y validación de tokens JWT firmados. Autenticación stateless entre frontend y backend.</p>
+    </div>
+  </div>
+
+  <hr class="separator">
+  <h3 style="margin-top:.5rem">Base de datos — capa de datos</h3>
+
+  <div class="card card-success">
+    <div class="row">
+      <div class="icon-wrap" style="background:var(--bg-success)"><i class="ti ti-database" style="color:var(--text-success);font-size:18px" aria-hidden="true"></i></div>
+      <div style="flex:1">
+        <h4>PostgreSQL 17 <span class="badge b-green">Activo</span></h4>
+        <p>Motor de base de datos relacional open source. Soporta ACID completo, índices avanzados, JSON nativo y consultas complejas. Tablas activas: <code>users</code> · <code>posts</code></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ARQUITECTURA ══ -->
+<div class="panel" id="panel-arquitectura">
+  <h3>Flujo completo del sistema</h3>
+
+  <div class="card" style="font-family:var(--font-mono);font-size:12px;color:var(--text-secondary);line-height:2;white-space:pre-wrap">USUARIO (navegador)
+    │
+    ▼
+┌─────────────────────────────────┐
+│  REACT + VITE  :5173            │  ← SPA en el navegador
+│  • Zustand  (estado global)     │
+│  • React Router (navegación)    │
+│  • TanStack Query (caché API)   │
+│  • Framer Motion (animaciones)  │
+└─────────────────────────────────┘
+    │  HTTP/JSON  (Axios + JWT)
+    ▼
+┌─────────────────────────────────┐
+│  FASTAPI  :8000/api/v1          │  ← API REST
+│  • /auth  (login · register)   │
+│  • /posts (CRUD completo)      │
+│  • /users (perfiles)           │
+│  • Pydantic (validación)       │
+│  • JWT (autenticación)         │
+│  • Bcrypt (seguridad)          │
+└─────────────────────────────────┘
+    │  SQLAlchemy ORM
+    ▼
+┌─────────────────────────────────┐
+│  POSTGRESQL  :5432              │  ← Persistencia
+│  • tabla: users                 │
+│  • tabla: posts                 │
+│  • índices optimizados          │
+└─────────────────────────────────┘</div>
+
+  <hr class="separator">
+  <h3>Patrones de arquitectura aplicados</h3>
+  <div class="grid2">
+    <div class="card card-accent">
+      <h4>REST API</h4>
+      <p>Comunicación stateless entre frontend y backend mediante verbos HTTP (GET, POST, PUT, DELETE) y respuestas JSON estandarizadas.</p>
+    </div>
+    <div class="card card-accent">
+      <h4>JWT Stateless Auth</h4>
+      <p>El servidor no guarda sesiones. El token firmado contiene toda la información del usuario y viaja en cada petición.</p>
+    </div>
+    <div class="card card-pro">
+      <h4>Arquitectura en capas</h4>
+      <p>Routers → Schemas → Models → Database. Cada capa tiene una única responsabilidad y no salta a capas no adyacentes.</p>
+    </div>
+    <div class="card card-pro">
+      <h4>Component-driven UI</h4>
+      <p>Cada pieza visual es un componente React reutilizable, aislado y con su propio estado. Composición sobre herencia.</p>
+    </div>
+    <div class="card card-success">
+      <h4>ORM Pattern</h4>
+      <p>SQLAlchemy abstrae el SQL. Los modelos Python representan tablas. Previene SQL injection y simplifica las consultas.</p>
+    </div>
+    <div class="card card-success">
+      <h4>Global State (Zustand)</h4>
+      <p>Estado del usuario centralizado. Un solo store accesible desde cualquier componente sin prop drilling.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REQUERIMIENTOS ══ -->
+<div class="panel" id="panel-requerimientos">
+  <h3>Requerimientos funcionales — lo que debe hacer la app</h3>
+
+  <div class="card card-success">
+    <h4><i class="ti ti-check" aria-hidden="true" style="color:var(--text-success)"></i> Implementados <span class="badge b-green">Completos</span></h4>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-success);width:22px;height:22px"><i class="ti ti-check" style="color:var(--text-success);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-01 · Registro de usuarios con email, contraseña y username</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-success);width:22px;height:22px"><i class="ti ti-check" style="color:var(--text-success);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-02 · Inicio de sesión con JWT (60 min de expiración)</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-success);width:22px;height:22px"><i class="ti ti-check" style="color:var(--text-success);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-03 · CRUD completo de publicaciones (poemas y cuentos)</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-success);width:22px;height:22px"><i class="ti ti-check" style="color:var(--text-success);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-04 · Paginación de publicaciones con filtros por tipo y etiqueta</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-success);width:22px;height:22px"><i class="ti ti-check" style="color:var(--text-success);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-05 · Publicaciones destacadas (featured)</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-success);width:22px;height:22px"><i class="ti ti-check" style="color:var(--text-success);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-06 · Contador automático de vistas por publicación</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-success);width:22px;height:22px"><i class="ti ti-check" style="color:var(--text-success);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-07 · Perfil público de usuario por username</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-success);width:22px;height:22px"><i class="ti ti-check" style="color:var(--text-success);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-08 · Rutas protegidas — solo usuarios autenticados publican</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-success);width:22px;height:22px"><i class="ti ti-check" style="color:var(--text-success);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-09 · Health check del servidor y la base de datos</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-success);width:22px;height:22px"><i class="ti ti-check" style="color:var(--text-success);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-10 · CORS configurado para frontend local</span></div>
+  </div>
+
+  <div class="card card-warning" style="margin-top:10px">
+    <h4><i class="ti ti-clock" aria-hidden="true" style="color:var(--text-warning)"></i> En desarrollo <span class="badge b-yellow">Pendientes</span></h4>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-warning);width:22px;height:22px"><i class="ti ti-clock" style="color:var(--text-warning);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-11 · Formulario frontend para publicar poema/cuento</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-warning);width:22px;height:22px"><i class="ti ti-clock" style="color:var(--text-warning);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-12 · Dashboard del autor con gestión de sus publicaciones</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-warning);width:22px;height:22px"><i class="ti ti-clock" style="color:var(--text-warning);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-13 · Página de detalle completo de cada publicación</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-warning);width:22px;height:22px"><i class="ti ti-clock" style="color:var(--text-warning);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-14 · Edición y eliminación desde el frontend</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-warning);width:22px;height:22px"><i class="ti ti-clock" style="color:var(--text-warning);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-15 · Buscador de publicaciones por título y etiqueta</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-warning);width:22px;height:22px"><i class="ti ti-clock" style="color:var(--text-warning);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-16 · Subida de imagen de portada para publicaciones</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-warning);width:22px;height:22px"><i class="ti ti-clock" style="color:var(--text-warning);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-17 · Panel de administración (gestión global)</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-warning);width:22px;height:22px"><i class="ti ti-clock" style="color:var(--text-warning);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-18 · Módulo de tienda y carrito de compras</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-warning);width:22px;height:22px"><i class="ti ti-clock" style="color:var(--text-warning);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-19 · Integración pasarela de pagos (Wompi/PayU)</span></div>
+    <div class="check-item"><div class="icon-wrap" style="background:var(--bg-warning);width:22px;height:22px"><i class="ti ti-clock" style="color:var(--text-warning);font-size:12px" aria-hidden="true"></i></div><span class="check-label">RF-20 · Renovación automática del JWT (refresh token)</span></div>
+  </div>
+
+  <hr class="separator">
+  <h3>Requerimientos no funcionales — calidad del sistema</h3>
+  <div class="grid2">
+    <div class="card card-accent"><h4>Rendimiento</h4><ul><li>Tiempo de carga inicial &lt; 3 segundos</li><li>API response &lt; 200ms en operaciones simples</li><li>Lighthouse score &gt; 85</li></ul></div>
+    <div class="card card-accent"><h4>Seguridad</h4><ul><li>HTTPS obligatorio en producción</li><li>Variables de entorno fuera del código</li><li>Rate limiting en endpoints críticos</li><li>Validación de inputs en frontend y backend</li></ul></div>
+    <div class="card card-accent"><h4>Disponibilidad</h4><ul><li>Uptime objetivo: 99.5%</li><li>Respuesta de error clara ante fallos</li><li>Health check en /health activo</li></ul></div>
+    <div class="card card-accent"><h4>Escalabilidad</h4><ul><li>Arquitectura stateless (lista para escalar)</li><li>Paginación en todos los listados</li><li>Índices en campos de búsqueda frecuente</li></ul></div>
+    <div class="card card-accent"><h4>Usabilidad</h4><ul><li>Diseño responsivo (móvil, tablet, desktop)</li><li>Mensajes de error claros para el usuario</li><li>Accesibilidad básica (roles ARIA)</li></ul></div>
+    <div class="card card-accent"><h4>Mantenibilidad</h4><ul><li>Código modular con separación de capas</li><li>Variables de configuración centralizadas</li><li>Documentación viva en Swagger (/docs)</li></ul></div>
+  </div>
+</div>
+
+<!-- ══ CHECKLIST ══ -->
+<div class="panel" id="panel-checklist">
+  <h3>Checklist de producción — marca lo que tienes listo</h3>
+
+  <div id="progress-wrap" style="margin-bottom:1.5rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <span style="font-size:13px;color:var(--text-secondary)">Progreso hacia producción</span>
+      <span style="font-size:13px;font-weight:500;color:var(--text-primary)" id="pct-label">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:10px">
+    <h4 style="margin-bottom:.75rem"><i class="ti ti-server" aria-hidden="true"></i> Backend</h4>
+    <div id="checks-backend">
+      <div class="check-item" data-group="backend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">FastAPI corriendo sin errores en local</span></div>
+      <div class="check-item" data-group="backend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">PostgreSQL conectado y tablas creadas automáticamente</span></div>
+      <div class="check-item" data-group="backend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Archivo .env con credenciales reales (no ejemplo)</span></div>
+      <div class="check-item" data-group="backend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">SECRET_KEY cambiada por una clave segura y larga</span></div>
+      <div class="check-item" data-group="backend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">CORS con los orígenes correctos del frontend</span></div>
+      <div class="check-item" data-group="backend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">DEBUG=False en producción</span></div>
+      <div class="check-item" data-group="backend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Todos los endpoints probados en Swagger</span></div>
+      <div class="check-item" data-group="backend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">/health responde correctamente</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:10px">
+    <h4 style="margin-bottom:.75rem"><i class="ti ti-brand-react" aria-hidden="true"></i> Frontend</h4>
+    <div id="checks-frontend">
+      <div class="check-item" data-group="frontend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">npm run dev sin errores en consola</span></div>
+      <div class="check-item" data-group="frontend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Login y registro funcionando desde la UI</span></div>
+      <div class="check-item" data-group="frontend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Poemas cargando desde el backend real</span></div>
+      <div class="check-item" data-group="frontend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Token JWT guardado y enviado en peticiones protegidas</span></div>
+      <div class="check-item" data-group="frontend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Rutas protegidas redirigen si no hay sesión</span></div>
+      <div class="check-item" data-group="frontend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Formulario de crear publicación operativo</span></div>
+      <div class="check-item" data-group="frontend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">npm run build sin errores (bundle de producción)</span></div>
+      <div class="check-item" data-group="frontend"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Diseño responsivo verificado en móvil</span></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:10px">
+    <h4 style="margin-bottom:.75rem"><i class="ti ti-shield-check" aria-hidden="true"></i> Seguridad</h4>
+    <div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Contraseñas encriptadas con Bcrypt (nunca texto plano)</span></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">.env en .gitignore (nunca subir al repositorio)</span></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">HTTPS configurado en dominio de producción</span></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Validación de datos en backend (Pydantic schemas)</span></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Validación de datos en frontend (formularios)</span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4 style="margin-bottom:.75rem"><i class="ti ti-rocket" aria-hidden="true"></i> Deploy</h4>
+    <div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Repositorio Git creado y código subido</span></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Backend desplegado en Railway o Render</span></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Base de datos PostgreSQL en la nube</span></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Frontend desplegado en Vercel</span></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Dominio propio configurado (libreto-azul.com.co)</span></div>
+      <div class="check-item"><div class="check-box" onclick="toggle(this)"></div><span class="check-label">Variables de entorno configuradas en el servidor</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DEPLOY ══ -->
+<div class="panel" id="panel-deploy">
+  <h3>Plan de despliegue a producción</h3>
+
+  <div class="card card-accent" style="margin-bottom:10px">
+    <h4>Paso 1 — Repositorio Git <span class="badge b-blue">Primero</span></h4>
+    <p>Crea un repositorio en GitHub con dos carpetas: <code>backend/</code> y <code>frontend/</code>. Asegúrate de que <code>.env</code> esté en <code>.gitignore</code> en ambos proyectos. Este es el punto de partida para todo el deploy.</p>
+  </div>
+
+  <div class="card card-accent" style="margin-bottom:10px">
+    <h4>Paso 2 — Base de datos en la nube <span class="badge b-blue">Railway</span></h4>
+    <p>En <strong>railway.app</strong> crea un servicio PostgreSQL gratuito. Copia la URL de conexión que te da Railway — tendrá este formato:<br><code style="font-size:11px">postgresql://user:pass@host:5432/dbname</code><br>Reemplaza tu <code>DATABASE_URL</code> en las variables de entorno del servidor.</p>
+  </div>
+
+  <div class="card card-pro" style="margin-bottom:10px">
+    <h4>Paso 3 — Backend en Railway <span class="badge b-purple">FastAPI</span></h4>
+    <p>En Railway crea un servicio web desde tu repositorio GitHub (carpeta <code>backend/</code>). Configura el comando de inicio:</p>
+    <div style="background:var(--surface-0);border-radius:var(--radius);padding:.5rem .75rem;margin-top:.5rem;font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">uvicorn app.main:app --host 0.0.0.0 --port $PORT</div>
+    <p style="margin-top:.5rem">Agrega las variables de entorno: <code>DB_HOST</code>, <code>DB_PASSWORD</code>, <code>SECRET_KEY</code>, <code>DEBUG=False</code>, <code>ALLOWED_ORIGINS</code> con la URL de Vercel.</p>
+  </div>
+
+  <div class="card card-success" style="margin-bottom:10px">
+    <h4>Paso 4 — Frontend en Vercel <span class="badge b-green">React</span></h4>
+    <p>En <strong>vercel.com</strong> importa el repositorio GitHub (carpeta <code>frontend/</code>). Vercel detecta Vite automáticamente. Agrega la variable de entorno:</p>
+    <div style="background:var(--surface-0);border-radius:var(--radius);padding:.5rem .75rem;margin-top:.5rem;font-family:var(--font-mono);font-size:12px;color:var(--text-secondary)">VITE_API_URL=https://tu-backend.railway.app/api/v1</div>
+    <p style="margin-top:.5rem">Actualiza <code>src/config/api.js</code> para leer esta variable con <code>import.meta.env.VITE_API_URL</code>.</p>
+  </div>
+
+  <div class="card card-warning" style="margin-bottom:10px">
+    <h4>Paso 5 — Dominio propio <span class="badge b-yellow">Opcional pero recomendado</span></h4>
+    <p>Registra <strong>libretazul.com.co</strong> en NIC Colombia (~$35.000/año) o GoDaddy (~$50.000/año). Apunta el DNS a Vercel para el frontend y a Railway para la API. Ambas plataformas gestionan el certificado HTTPS automáticamente.</p>
+  </div>
+
+  <hr class="separator">
+  <h3>Costos estimados de producción</h3>
+  <div class="grid3">
+    <div class="metric"><span class="metric-num" style="font-size:18px">$0</span><span class="metric-lbl">Railway (plan hobby)</span></div>
+    <div class="metric"><span class="metric-num" style="font-size:18px">$0</span><span class="metric-lbl">Vercel (plan free)</span></div>
+    <div class="metric"><span class="metric-num" style="font-size:18px">~$50k</span><span class="metric-lbl">Dominio anual COP</span></div>
+  </div>
+  <p style="margin-top:.75rem;text-align:center;font-size:12px;color:var(--text-muted)">Puedes lanzar a producción con inversión de $0 en infraestructura el primer año</p>
+
+  <hr class="separator">
+  <div style="text-align:center;padding:.5rem 0">
+    <button onclick="sendPrompt('Quiero comenzar el deploy a producción. ¿Por dónde empezamos?')" style="font-size:13px">
+      Iniciar proceso de deploy ↗
+    </button>
+  </div>
+</div>
+
+</div>
+
+<script>
+function showTab(name){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+function toggle(box){
+  box.classList.toggle('done');
+  const label=box.nextElementSibling;
+  label.classList.toggle('done');
+  if(box.classList.contains('done')){
+    box.innerHTML='<i class="ti ti-check" style="font-size:12px;color:#fff" aria-hidden="true"></i>';
+  } else {
+    box.innerHTML='';
+  }
+  updateProgress();
+}
+
+function updateProgress(){
+  const all=document.querySelectorAll('.check-box');
+  const done=document.querySelectorAll('.check-box.done');
+  const pct=Math.round((done.length/all.length)*100);
+  document.getElementById('progress-fill').style.width=pct+'%';
+  document.getElementById('pct-label').textContent=pct+'%';
+}
+
+updateProgress();
+</script>

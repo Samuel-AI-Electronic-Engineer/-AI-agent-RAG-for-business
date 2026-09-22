@@ -26,6 +26,12 @@ const useAuthStore = create((set) => ({
         set({ user });
     },
 
+    setToken: (token) => {
+        if (!token) return;
+        localStorage.setItem('pf_token', token);
+        set({ token });
+    },
+
     logout: () => {
         localStorage.removeItem('pf_token');
         localStorage.removeItem('pf_user');

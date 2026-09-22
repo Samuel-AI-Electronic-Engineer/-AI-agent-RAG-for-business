@@ -1,4 +1,7 @@
 from datetime import datetime, timedelta, timezone
+import hashlib
+import secrets
+import uuid
 from typing import Optional
 
 from jose import JWTError, jwt
@@ -35,13 +38,27 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         expires_delta or timedelta(
             minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    to_encode.update({"exp": expire})
+    to_encode.update({"exp": expire, "typ": "access", "jti": uuid.uuid4().hex})
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
 def decode_access_token(token: str) -> Optional[dict]:
     """Decodifica y valida un token JWT. Retorna None si es inválido."""
     try:
-        return jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        payload = jwt.decode(token, settings.SECRET_KEY,
+                             algorithms=[settings.ALGORITHM])
+        return payload if payload.get("typ") == "access" else None
     except JWTError:
         return None
+
+
+def create_refresh_token() -> tuple[str, str, datetime]:
+    """Genera el valor secreto del cookie y su hash persistible."""
+    raw_token = secrets.token_urlsafe(64)
+    expires_at = datetime.now(timezone.utc) + \
+        timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+    return raw_token, hash_refresh_token(raw_token), expires_at
+
+
+def hash_refresh_token(raw_token: str) -> str:
+    return hashlib.sha256(raw_token.encode("utf-8")).hexdigest()

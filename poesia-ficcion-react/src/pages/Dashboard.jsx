@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { getCurrentUser } from '../services/authService';
+import { getCurrentUser, logout as logoutRequest } from '../services/authService';
 import useAuthStore from '../store/authStore';
 import { useStore } from '../context/useStore';
 import api from '../config/api';
@@ -66,7 +66,12 @@ function Dashboard() {
         setIsSubscribed(nextValue);
     };
 
-    const handleLogout = () => {
+    const handleLogout = async () => {
+        try {
+            await logoutRequest();
+        } catch {
+            // The local session is still cleared when the server is unavailable.
+        }
         logout();
         navigate('/');
     };
