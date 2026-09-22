@@ -58,9 +58,11 @@ class Settings(BaseSettings):
             if not self.COOKIE_SECURE:
                 raise ValueError("COOKIE_SECURE debe ser true en producción")
             if self.COOKIE_SAMESITE == "none" and not self.COOKIE_SECURE:
-                raise ValueError("COOKIE_SAMESITE=none requiere COOKIE_SECURE=true")
+                raise ValueError(
+                    "COOKIE_SAMESITE=none requiere COOKIE_SECURE=true")
             if any("localhost" in origin or "127.0.0.1" in origin for origin in self.origins_list):
-                raise ValueError("ALLOWED_ORIGINS de producción no puede contener localhost")
+                raise ValueError(
+                    "ALLOWED_ORIGINS de producción no puede contener localhost")
         return self
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
