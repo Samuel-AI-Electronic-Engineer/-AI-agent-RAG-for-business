@@ -2174,6 +2174,11 @@ footer {
     color: var(--silver);
 }
 
+.status-pill.danger {
+    background: rgba(255, 108, 108, 0.12);
+    color: #ff9aa7;
+}
+
 .admin-heading {
     display: flex;
     align-items: end;

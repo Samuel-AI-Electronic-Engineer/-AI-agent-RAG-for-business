@@ -4,7 +4,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getCurrentUser, logout as logoutRequest } from '../services/authService';
 import useAuthStore from '../store/authStore';
 import { useStore } from '../context/useStore';
-import api from '../config/api';
+import { deletePost, getMyPosts } from '../services/postsService';
+
+const STATUS_LABELS = {
+    draft: { label: 'Borrador', pill: 'neutral' },
+    pending_review: { label: 'En revisión', pill: 'warning' },
+    published: { label: 'Publicado', pill: 'success' },
+    rejected: { label: 'Rechazado', pill: 'danger' },
+};
 
 function Dashboard() {
     const storedUser = useAuthStore((state) => state.user);
@@ -25,12 +32,11 @@ function Dashboard() {
         staleTime: 60_000,
     });
 
-    const { data: myPosts = [], isLoading: isLoadingPosts } = useQuery({
-        queryKey: ['posts', 'mine'],
+    const { data: myPosts = [], isLoading: isLoadingPosts, isError: isPostsError } = useQuery({
+        queryKey: ['posts', 'mine', null],
         queryFn: async () => {
-            const { data } = await api.get('/posts');
-            const items = data?.items || [];
-            return items.filter((post) => post.author?.id === user?.id);
+            const data = await getMyPosts(1, 12, null);
+            return data?.items || [];
         },
         enabled: !!user?.id,
     });
@@ -50,9 +56,7 @@ function Dashboard() {
     );
 
     const deleteMutation = useMutation({
-        mutationFn: async (postId) => {
-            await api.delete(`/posts/${postId}`);
-        },
+        mutationFn: deletePost,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['posts', 'mine'] });
         },
@@ -182,34 +186,37 @@ function Dashboard() {
 
                 {isLoadingPosts ? (
                     <p>Cargando publicaciones...</p>
+                ) : isPostsError ? (
+                    <p className="status-text error" role="alert">No fue posible cargar tus publicaciones. Intenta de nuevo.</p>
                 ) : myPosts.length === 0 ? (
                     <p>Aún no tienes publicaciones. Crea tu primera obra desde “Nueva publicación”.</p>
                 ) : (
                     <div style={{ display: 'grid', gap: '1rem' }}>
-                        {myPosts.map((post) => (
-                            <article key={post.id} style={{ border: '1px solid var(--border)', borderRadius: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.02)' }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-                                    <div>
-                                        <p style={{ margin: 0, color: 'var(--gold)' }}>{post.content_type}</p>
-                                        <h3 style={{ margin: '0.25rem 0' }}>{post.title}</h3>
-                                        <p style={{ margin: 0, color: 'var(--text-dim)' }}>
-                                            {post.views ?? 0} lecturas · {new Date(post.created_at).toLocaleDateString('es-CO')}
-                                        </p>
+                        {myPosts.map((post) => {
+                            const statusInfo = STATUS_LABELS[post.publication_status] || STATUS_LABELS.draft;
+                            return (
+                                <article key={post.id} style={{ border: '1px solid var(--border)', borderRadius: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.02)' }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                                        <div>
+                                            <p style={{ margin: 0, color: 'var(--gold)' }}>{post.content_type}</p>
+                                            <h3 style={{ margin: '0.25rem 0' }}>{post.title}</h3>
+                                            <span className={`status-pill ${statusInfo.pill}`} style={{ marginRight: '0.5rem' }}>{statusInfo.label}</span>
+                                            <span style={{ color: 'var(--text-dim)' }}>
+                                                {post.views ?? 0} lecturas · {new Date(post.created_at).toLocaleDateString('es-CO')}
+                                            </span>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                            <Link to={`/poema/${post.id}`} className="btn-ghost" style={{ width: 'auto', padding: '0.55rem 1rem' }}>
+                                                Ver
+                                            </Link>
+                                            <button type="button" className="btn-ghost" style={{ width: 'auto', padding: '0.55rem 1rem', color: '#ff9aa7' }} onClick={() => handleDelete(post.id)} disabled={deleteMutation.isPending}>
+                                                {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                        <Link to={`/poema/${post.id}`} className="btn-ghost" style={{ width: 'auto', padding: '0.55rem 1rem' }}>
-                                            Ver
-                                        </Link>
-                                        <button type="button" className="btn-ghost" style={{ width: 'auto', padding: '0.55rem 1rem' }}>
-                                            Editar
-                                        </button>
-                                        <button type="button" className="btn-ghost" style={{ width: 'auto', padding: '0.55rem 1rem', color: '#ff9aa7' }} onClick={() => handleDelete(post.id)} disabled={deleteMutation.isPending}>
-                                            {deleteMutation.isPending ? 'Eliminando...' : 'Eliminar'}
-                                        </button>
-                                    </div>
-                                </div>
-                            </article>
-                        ))}
+                                </article>
+                            );
+                        })}
                     </div>
                 )}
             </section>

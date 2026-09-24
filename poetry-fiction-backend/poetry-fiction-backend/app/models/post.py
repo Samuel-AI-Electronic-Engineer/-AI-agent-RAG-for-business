@@ -12,11 +12,31 @@ class ContentType(str, enum.Enum):
     STORY = "cuento"
 
 
+class PostPublicationStatus(str, enum.Enum):
+    DRAFT = "draft"
+    PENDING_REVIEW = "pending_review"
+    PUBLISHED = "published"
+    REJECTED = "rejected"
+
+
 class Post(Base):
     __tablename__ = "posts"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     title: Mapped[str] = mapped_column(String(200), nullable=False, index=True)
+    publication_status: Mapped[PostPublicationStatus] = mapped_column(
+        Enum(PostPublicationStatus, values_callable=lambda enum_cls: [
+             e.value for e in enum_cls]),
+        nullable=False,
+        default=PostPublicationStatus.DRAFT,
+        index=True,
+    )
+    is_published: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False)
+    rejection_reason: Mapped[str | None] = mapped_column(
+        String(500), nullable=True,
+        comment="Motivo indicado por un administrador al rechazar la publicación"
+    )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     excerpt: Mapped[str | None] = mapped_column(String(500), nullable=True)
     content_type: Mapped[ContentType] = mapped_column(
@@ -29,7 +49,6 @@ class Post(Base):
         comment="Etiquetas separadas por comas: amor,tristeza,noche"
     )
     views: Mapped[int] = mapped_column(Integer, default=0)
-    is_published: Mapped[bool] = mapped_column(Boolean, default=True)
     is_featured: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(timezone.utc), index=True
@@ -45,6 +64,9 @@ class Post(Base):
         Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     author: Mapped["User"] = relationship("User", back_populates="posts")  # noqa: F821
+
+    def sync_publication_status(self) -> None:
+        self.is_published = self.publication_status == PostPublicationStatus.PUBLISHED
 
     @property
     def tags_list(self) -> list[str]:

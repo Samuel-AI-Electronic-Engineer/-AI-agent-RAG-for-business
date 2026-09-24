@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel, Field
 
-from app.models.post import ContentType
+from app.models.post import ContentType, PostPublicationStatus
 from app.schemas.user import UserPublic
 
 
@@ -17,7 +17,10 @@ class PostCreate(BaseModel):
     cover_image_url: str | None = Field(
         None, example="https://ejemplo.com/imagen.jpg")
     tags: str | None = Field(None, example="amor,lluvia,nostalgia")
-    is_published: bool = Field(True)
+    publication_status: PostPublicationStatus | None = Field(
+        default=None, example=PostPublicationStatus.DRAFT
+    )
+    is_published: bool | None = Field(default=None)
 
 
 class PostUpdate(BaseModel):
@@ -27,6 +30,7 @@ class PostUpdate(BaseModel):
     content_type: ContentType | None = None
     cover_image_url: str | None = None
     tags: str | None = None
+    publication_status: PostPublicationStatus | None = None
     is_published: bool | None = None
     is_featured: bool | None = None
 
@@ -44,6 +48,8 @@ class PostOut(BaseModel):
     tags: str | None
     tags_list: list[str] = []
     views: int
+    publication_status: PostPublicationStatus
+    rejection_reason: str | None
     is_published: bool
     is_featured: bool
     created_at: datetime
@@ -64,6 +70,8 @@ class PostSummary(BaseModel):
     tags: str | None
     tags_list: list[str] = []
     views: int
+    publication_status: PostPublicationStatus
+    rejection_reason: str | None
     is_featured: bool
     created_at: datetime
     author: UserPublic

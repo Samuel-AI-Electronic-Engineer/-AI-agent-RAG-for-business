@@ -7,9 +7,10 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
+from app import database as database_module
 from app.core.config import get_settings
 from app.core.security import hash_password
-from app.database import check_db_connection, SessionLocal
+from app.database import check_db_connection
 from app.models.post import ContentType, Post
 from app.models.product import Product
 from app.models.user import User
@@ -24,7 +25,7 @@ def create_dev_seed_data() -> None:
     if not settings.DEBUG:
         return
 
-    with SessionLocal() as db:
+    with database_module.SessionLocal() as db:
         demo_user = db.query(User).filter(
             User.email.in_(["demo@poesia.com", "demo@poesia.local"])).first()
         if demo_user and demo_user.email == "demo@poesia.local":
@@ -48,6 +49,7 @@ def create_dev_seed_data() -> None:
                 "content_type": ContentType.POEM,
                 "cover_image_url": None,
                 "tags": "noche,poema,susurro",
+                "publication_status": "published",
                 "is_published": True,
                 "is_featured": True,
             },
@@ -58,6 +60,7 @@ def create_dev_seed_data() -> None:
                 "content_type": ContentType.STORY,
                 "cover_image_url": None,
                 "tags": "misterio,viaje,sueños",
+                "publication_status": "published",
                 "is_published": True,
                 "is_featured": False,
             },
@@ -68,6 +71,7 @@ def create_dev_seed_data() -> None:
                 "content_type": ContentType.POEM,
                 "cover_image_url": None,
                 "tags": "lluvia,ciudad,poema",
+                "publication_status": "published",
                 "is_published": True,
                 "is_featured": False,
             },

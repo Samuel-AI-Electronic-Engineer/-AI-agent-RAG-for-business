@@ -11,6 +11,7 @@ function CreatePost() {
         content: '',
         excerpt: '',
         tags: '',
+        publication_status: 'draft',
     });
     const [error, setError] = useState('');
 
@@ -20,7 +21,7 @@ function CreatePost() {
             return data;
         },
         onSuccess: () => {
-            navigate('/dashboard');
+            navigate('/dashboard/publicaciones', { state: { justCreated: true } });
         },
         onError: (err) => {
             setError(err?.response?.data?.detail || 'No se pudo publicar la obra.');
@@ -49,6 +50,7 @@ function CreatePost() {
             title: form.title.trim(),
             excerpt: form.excerpt.trim() || undefined,
             tags: form.tags.trim() || undefined,
+            publication_status: 'draft',
         });
     };
 

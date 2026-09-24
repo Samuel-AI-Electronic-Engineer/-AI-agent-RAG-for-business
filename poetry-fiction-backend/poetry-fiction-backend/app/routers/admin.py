@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.database import get_db
 from app.deps import get_current_admin
-from app.models.post import Post
+from app.models.post import Post, PostPublicationStatus
 from app.models.user import User
 from app.schemas.post import PostOut
 from app.schemas.user import AdminUserUpdate, UserMe
@@ -74,8 +74,10 @@ def admin_stats(
     active_users = db.query(User).filter(User.is_active == True).count()
     admin_users = db.query(User).filter(User.is_admin == True).count()
     total_posts = db.query(Post).count()
-    published_posts = db.query(Post).filter(Post.is_published == True).count()
-    pending_posts = db.query(Post).filter(Post.is_published == False).count()
+    published_posts = db.query(Post).filter(
+        Post.publication_status == PostPublicationStatus.PUBLISHED).count()
+    pending_posts = db.query(Post).filter(Post.publication_status.in_(
+        [PostPublicationStatus.DRAFT, PostPublicationStatus.PENDING_REVIEW, PostPublicationStatus.REJECTED])).count()
     total_views = sum((row[0] or 0) for row in db.query(Post.views).all())
 
     return {
@@ -98,7 +100,7 @@ def moderation_queue(
     return (
         db.query(Post)
         .options(joinedload(Post.author))
-        .filter(Post.is_published == False)
+        .filter(Post.publication_status == PostPublicationStatus.PENDING_REVIEW)
         .order_by(Post.created_at.asc())
         .all()
     )
@@ -107,19 +109,37 @@ def moderation_queue(
 @router.patch("/posts/{post_id}/publication", response_model=PostOut, summary="Moderar publicación")
 def moderate_post(
     post_id: int,
-    is_published: bool = Query(...,
-                               description="Publicar o retirar la publicación"),
+    pub_status: PostPublicationStatus = Query(...,
+                                              description="Estado editorial final"),
     db: Session = Depends(get_db),
     _admin: User = Depends(get_current_admin),
 ):
-    """Publica o retira una obra desde la cola de moderación."""
+    """Ejecuta la transición editorial según el estado definido."""
     post = db.query(Post).options(joinedload(Post.author)
                                   ).filter(Post.id == post_id).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="Publicación no encontrada")
 
-    post.is_published = is_published
+    current_status = post.publication_status
+    valid_transitions = {
+        PostPublicationStatus.PENDING_REVIEW: {PostPublicationStatus.PUBLISHED, PostPublicationStatus.REJECTED},
+        PostPublicationStatus.PUBLISHED: {PostPublicationStatus.DRAFT},
+        PostPublicationStatus.REJECTED: {PostPublicationStatus.DRAFT},
+    }
+    if current_status in valid_transitions and pub_status in valid_transitions[current_status]:
+        post.publication_status = pub_status
+        post.sync_publication_status()
+    else:
+        if current_status == PostPublicationStatus.DRAFT and pub_status == PostPublicationStatus.DRAFT:
+            post.publication_status = pub_status
+            post.sync_publication_status()
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Transición editorial no permitida",
+            )
+
     db.commit()
     db.refresh(post)
     return post

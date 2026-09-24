@@ -174,13 +174,20 @@ function PublicationsPage() {
     const postsQuery = useQuery({ queryKey: ['admin', 'posts'], queryFn: async () => (await api.get('/admin/posts')).data });
     const posts = postsQuery.data?.items || [];
     const moderateMutation = useMutation({
-        mutationFn: ({ postId, isPublished }) => api.patch(`/admin/posts/${postId}/publication`, null, { params: { is_published: isPublished } }),
+        mutationFn: ({ postId, pubStatus }) => api.patch(`/admin/posts/${postId}/publication`, null, { params: { pub_status: pubStatus } }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'posts'] });
             queryClient.invalidateQueries({ queryKey: ['admin', 'moderation'] });
             queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] });
         },
     });
+
+    const statusPill = (status) => ({
+        draft: { label: 'Borrador', pill: 'neutral' },
+        pending_review: { label: 'En revisión', pill: 'warning' },
+        published: { label: 'Publicado', pill: 'success' },
+        rejected: { label: 'Rechazado', pill: 'danger' },
+    }[status] || { label: status, pill: 'neutral' });
 
     return (
         <section className="panel-section">
@@ -203,15 +210,30 @@ function PublicationsPage() {
                         </tr>
                     </thead>
                     <tbody>
-                        {posts.map((post) => (
-                            <tr key={post.id}>
-                                <td>{post.title}</td>
-                                <td>{post.author?.full_name || post.author?.username}</td>
-                                <td><span className={`status-pill ${post.is_published ? 'success' : 'warning'}`}>{post.is_published ? 'Publicado' : 'Pendiente'}</span></td>
-                                <td>{post.views}</td>
-                                <td><button type="button" className="table-action-button" onClick={() => moderateMutation.mutate({ postId: post.id, isPublished: !post.is_published })} disabled={moderateMutation.isPending}>{post.is_published ? 'Retirar' : 'Publicar'}</button></td>
-                            </tr>
-                        ))}
+                        {posts.map((post) => {
+                            const info = statusPill(post.publication_status);
+                            return (
+                                <tr key={post.id}>
+                                    <td>{post.title}</td>
+                                    <td>{post.author?.full_name || post.author?.username}</td>
+                                    <td><span className={`status-pill ${info.pill}`}>{info.label}</span></td>
+                                    <td>{post.views}</td>
+                                    <td>
+                                        <div className="table-actions">
+                                            {post.publication_status === 'published' && (
+                                                <button type="button" className="table-action-button" onClick={() => moderateMutation.mutate({ postId: post.id, pubStatus: 'draft' })} disabled={moderateMutation.isPending}>Retirar</button>
+                                            )}
+                                            {post.publication_status === 'pending_review' && (
+                                                <>
+                                                    <button type="button" className="table-action-button" onClick={() => moderateMutation.mutate({ postId: post.id, pubStatus: 'published' })} disabled={moderateMutation.isPending}>Aprobar</button>
+                                                    <button type="button" className="table-action-button" onClick={() => moderateMutation.mutate({ postId: post.id, pubStatus: 'rejected' })} disabled={moderateMutation.isPending}>Rechazar</button>
+                                                </>
+                                            )}
+                                        </div>
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
                 <AdminQueryState query={postsQuery}>{posts.length === 0 && <p className="panel-feedback">No hay publicaciones registradas.</p>}</AdminQueryState>
@@ -248,8 +270,8 @@ function ModerationPage() {
     const queryClient = useQueryClient();
     const moderationQuery = useQuery({ queryKey: ['admin', 'moderation'], queryFn: async () => (await api.get('/admin/moderation')).data });
     const pendingPosts = moderationQuery.data || [];
-    const approveMutation = useMutation({
-        mutationFn: (postId) => api.patch(`/admin/posts/${postId}/publication`, null, { params: { is_published: true } }),
+    const moderateMutation = useMutation({
+        mutationFn: ({ postId, pubStatus }) => api.patch(`/admin/posts/${postId}/publication`, null, { params: { pub_status: pubStatus } }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin', 'moderation'] });
             queryClient.invalidateQueries({ queryKey: ['admin', 'posts'] });
@@ -269,7 +291,7 @@ function ModerationPage() {
                 <article className="panel-card">
                     <div className="panel-card-head"><h2>Alertas</h2></div>
                     <AdminQueryState query={moderationQuery}>
-                        {pendingPosts.length === 0 ? <p className="panel-feedback">No hay publicaciones pendientes.</p> : <ul className="checklist">{pendingPosts.map((post) => <li key={post.id}><span><strong>{post.title}</strong> · {post.author?.full_name || post.author?.username}</span><button type="button" className="table-action-button" onClick={() => approveMutation.mutate(post.id)} disabled={approveMutation.isPending}>Aprobar</button></li>)}</ul>}
+                        {pendingPosts.length === 0 ? <p className="panel-feedback">No hay publicaciones pendientes.</p> : <ul className="checklist">{pendingPosts.map((post) => <li key={post.id}><span><strong>{post.title}</strong> · {post.author?.full_name || post.author?.username}</span><div className="table-actions"><button type="button" className="table-action-button" onClick={() => moderateMutation.mutate({ postId: post.id, pubStatus: 'published' })} disabled={moderateMutation.isPending}>Aprobar</button><button type="button" className="table-action-button" onClick={() => moderateMutation.mutate({ postId: post.id, pubStatus: 'rejected' })} disabled={moderateMutation.isPending}>Rechazar</button></div></li>)}</ul>}
                     </AdminQueryState>
                 </article>
                 <article className="panel-card">

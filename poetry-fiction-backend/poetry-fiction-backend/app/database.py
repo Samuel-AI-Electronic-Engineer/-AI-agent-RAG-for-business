@@ -6,14 +6,21 @@ from app.core.config import get_settings
 
 settings = get_settings()
 
-engine = create_engine(
-    settings.database_url,
-    pool_pre_ping=True,
-    pool_recycle=3600,
-    pool_size=10,
-    max_overflow=20,
-    echo=settings.DEBUG,
-)
+database_kwargs = {
+    "echo": settings.DEBUG,
+}
+
+if settings.database_url.startswith("sqlite"):
+    engine = create_engine(settings.database_url, **database_kwargs)
+else:
+    engine = create_engine(
+        settings.database_url,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+        pool_size=10,
+        max_overflow=20,
+        **database_kwargs,
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
